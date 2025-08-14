@@ -1,0 +1,1551 @@
+{
+  "name": "Reddit Market Research - Mindset Coach",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d4ebefb2-c759-4c29-8b4f-ddac19675227",
+              "leftValue": "={{ $json.keys().length > 0 }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3120,
+        576
+      ],
+      "id": "8058b7a9-a311-47d6-ba74-38349c7757fd",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "postComment",
+        "operation": "getAll",
+        "subreddit": "={{ $json.subreddit }}",
+        "postId": "={{ $json.id }}",
+        "limit": 10
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        -2640,
+        432
+      ],
+      "id": "6c4d7fa8-b3c1-4728-bdf4-ef36eb127332",
+      "name": "Get many comments in a post",
+      "executeOnce": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "HaQ8FAsBthECTlGl",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a senior market research analyst helping coaches and consultants understand their audience so they can create more relevant and valuable content. Your task is to analyze the following Reddit thread, categorize its primary intent, and extract key business pain points.\n\nRead the entire context provided below, which includes the original post and its comments.\n\n**CONTEXT:**\n\nPost Content: {{ $json.post_content }}\nPost Title: {{ $json.post_title }}\nPost Comments: {{ $json.comments }}\n\n**OUTPUT INSTRUCTIONS:**\n- Respond ONLY with a valid JSON object that exactly matches the structure below.\n- Do NOT include markdown formatting, explanations, or extra text.\n- If a field has no applicable data, return an empty string or empty array as appropriate.\n\n**CATEGORY DEFINITIONS:**\n- \"Pain Point\": The OP is describing a problem or challenge they personally face.\n- \"Sales Pitch\": The OP is promoting their own tool, service, or product (even if they request feedback or validation).\n- \"General Question\": The OP is seeking advice, opinions, or information but not describing a personal problem.\n- \"Other\": Any post that does not fit the above categories.\n\n**JSON STRUCTURE:**\n{\n  \"post_category\": \"One of: 'Pain Point', 'Sales Pitch', 'General Question', 'Other'.\",\n  \"primary_pain_point\": \"Summarize the core problem in one sentence.\",\n  \"is_validated_by_community\": \"Yes\", \"No\", or \"Partially\".\",\n  \"related_pain_points\": [\n    \"Array of distinct new problems mentioned by commenters, or [].\"\n  ],\n  \"mentioned_solutions\": [\n    \"Array of specific tools, software, or manual workarounds from comments, or [].\"\n  ],\n  \"business_opportunity_summary\": \"5-10 words describing the content opportunity for a coach.\",\n  \"id\": \"{{ $json.post_id }}\"\n}\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.1,
+      "position": [
+        -1392,
+        592
+      ],
+      "id": "594979ff-e370-41f9-a37e-b64337fb12a2",
+      "name": "AI Agent",
+      "executeOnce": false,
+      "retryOnFail": true,
+      "maxTries": 5,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        800
+      ],
+      "id": "adcb0d83-7a50-4bd8-a0b2-5a9937a58875",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post_category\": \"Categorize the post's intent. Must be one of the following strings: 'Pain Point', 'Sales Pitch', 'General Question', or 'Other'.\",\n  \"primary_pain_point\": \"...\",\n  \"is_validated_by_community\": \"...\",\n  \"related_pain_points\": [\"string\",\"string\"],\n  \"mentioned_solutions\": [\"string\", \"string\"],\n  \"business_opportunity_summary\": \"...\",\n  \"id\": \"...\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -1200,
+        800
+      ],
+      "id": "429d2074-1559-4534-955c-59939969fbb0",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fStUJMZn13TZaD4BSk_izKpsDZ-LUtm1rEDIWnZ7zBI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "primary_pain_point": "={{ $json.output.primary_pain_point }}",
+            "is_validated_by_community": "={{ $json.output.is_validated_by_community }}",
+            "related_pain_points": "={{ $json.output.related_pain_points.join(\", \") }}",
+            "mentioned_solutions": "={{ $json.output.mentioned_solutions.join(\", \") }}",
+            "business_opportunity_summary": "={{ $json.output.business_opportunity_summary }}",
+            "emailed?": "FALSE",
+            "post_category": "={{ $json.output.post_category }}",
+            "id": "={{ $json.output.id }}",
+            "post_title": "={{ $json.post_title}}",
+            "source": "=Reddit",
+            "topic": "={{ $json.topic }}",
+            "datetime": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "url": "={{ $json.link }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "datetime",
+              "displayName": "datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "post_category",
+              "displayName": "post_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "post_title",
+              "displayName": "post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "primary_pain_point",
+              "displayName": "primary_pain_point",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "is_validated_by_community",
+              "displayName": "is_validated_by_community",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "related_pain_points",
+              "displayName": "related_pain_points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "mentioned_solutions",
+              "displayName": "mentioned_solutions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "business_opportunity_summary",
+              "displayName": "business_opportunity_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "emailed?",
+              "displayName": "emailed?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -368,
+        464
+      ],
+      "id": "caeac6c3-cad4-4ba8-89df-9cdd0653bc7d",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4U2sXIYrTuhj2I8J",
+          "name": "Google Sheets account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -592,
+        432
+      ],
+      "id": "18b78783-5a66-45f9-b31c-e7930f56b2e1",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "55fc5831-00dc-4552-8a01-ebdc78d64746",
+              "leftValue": "={{ !!$json.output }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1008,
+        576
+      ],
+      "id": "b699cb15-91c8-4f57-9130-7ac6226e6534",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "emailed?",
+              "lookupValue": "=FALSE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -368,
+        304
+      ],
+      "id": "66446552-e7ab-4a3c-8747-1ddd24745d5b",
+      "name": "Get row(s) in sheet",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4U2sXIYrTuhj2I8J",
+          "name": "Google Sheets account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- NEW HELPER FUNCTION for Category ---\n// This function creates a color-coded HTML tag for the post category.\nconst getCategoryTag = (category) => {\n  // Default styles for 'Other' or unexpected values\n  let color = '#34495e'; // Dark Grey\n  let backgroundColor = '#ecf0f1'; // Light Grey\n  const text = category || 'Other';\n  \n  const lowerCategory = (category || '').toLowerCase();\n\n  if (lowerCategory === 'pain point') {\n    color = '#27ae60'; // Green\n    backgroundColor = '#eafaf1';\n  } else if (lowerCategory === 'sales pitch') {\n    color = '#e74c3c'; // Red\n    backgroundColor = '#fdeded';\n  }\n\n  return `<span style=\"color: ${color}; background-color: ${backgroundColor}; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; white-space: nowrap;\">${text}</span>`;\n};\n\n// --- Helper function for Validation status ---\nconst getValidationTag = (status) => {\n  // Default styles for 'N/A' or unexpected values\n  let color = '#34495e'; // Dark Grey\n  let backgroundColor = '#ecf0f1'; // Light Grey\n  const text = status || 'N/A';\n  \n  // Normalize the status to lowercase for reliable comparison\n  const lowerStatus = (status || '').toLowerCase();\n\n  if (lowerStatus === 'yes') {\n    color = '#27ae60'; // Green\n    backgroundColor = '#eafaf1';\n  } else if (lowerStatus === 'no') {\n    color = '#e74c3c'; // Red\n    backgroundColor = '#fdeded';\n  } else if (lowerStatus === 'partially') {\n    color = '#f39c12'; // Amber\n    backgroundColor = '#fef5e7';\n  }\n\n  // Return the complete HTML tag with inline styles\n  return `<span style=\"color: ${color}; background-color: ${backgroundColor}; padding: 3px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; white-space: nowrap;\">${text}</span>`;\n};\n\n// --- Helper function to format arrays into HTML list items ---\nconst formatList = (items) => {\n  // 1. Handle null, undefined, or empty string cases first.\n  if (!items) {\n    return '<li>None mentioned.</li>';\n  }\n\n  let parsedItems = [];\n\n  // 2. If it's already an array, use it directly.\n  if (Array.isArray(items)) {\n    parsedItems = items;\n  }\n  // 3. If it's a string, parse it intelligently.\n  else if (typeof items === 'string') {\n    const trimmedString = items.trim();\n    \n    // Check if it looks like a JSON array string.\n    if (trimmedString.startsWith('[') && trimmedString.endsWith(']')) {\n      try {\n        // Replace single quotes for better JSON compatibility and parse.\n        parsedItems = JSON.parse(trimmedString.replace(/'/g, '\"'));\n      } catch (e) {\n        // If JSON parsing fails, treat it as a plain string and continue.\n        parsedItems = [trimmedString];\n      }\n    } else {\n      // If not a JSON array string, assume it's comma-separated.\n      parsedItems = trimmedString.split(',').map(item => item.trim());\n    }\n  }\n\n  // 4. Clean up the array by filtering out any empty strings that might result.\n  const cleanedItems = parsedItems.filter(item => item);\n\n  // 5. If the final array has no items, return the base case.\n  if (cleanedItems.length === 0) {\n    return '<li>None mentioned.</li>';\n  }\n\n  // 6. Format the cleaned items into an HTML list.\n  return cleanedItems.map(item => `<li>${item}</li>`).join('');\n};\n\n// --- Main Loop (with updates) ---\nconst opportunities = items;\nlet cardsHtml = '';\nfor (const item of opportunities) {\n  const data = item.json;\n  const relatedPointsHtml = formatList(data.related_pain_points);\n  const mentionedSolutionsHtml = formatList(data.mentioned_solutions);\n  \n  // Generate the styled tags\n  const categoryTagHtml = getCategoryTag(data.post_category); // **NEW**\n  const validationTagHtml = getValidationTag(data.is_validated_by_community);\n\n  cardsHtml += `\n    <div style=\"border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 20px; padding: 20px;\">\n        <div style=\"margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;\">\n            ${categoryTagHtml}\n        </div>\n        <h3 style=\"margin-top: 0; margin-bottom: 5px; color: #2980b9; font-size: 18px;\">\n            ${data.business_opportunity_summary || 'N/A'}\n        </h3>\n        <p style=\"font-size: 12px; color: #7f8c8d; margin-top: 0; margin-bottom: 15px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px;\">\n            <span><strong>Topic:</strong> ${data.topic || 'N/A'}</span>\n            <span>|</span>\n            <span><strong>Validated:</strong> ${validationTagHtml}</span>\n        </p>\n        <p style=\"font-size: 15px; line-height: 1.6; color: #34495e;\">\n            <strong>Primary Pain Point:</strong> ${data.primary_pain_point || 'N/A'}\n        </p>\n        <h4 style=\"color: #2c3e50; border-bottom: 1px solid #ecf0f1; padding-bottom: 5px; font-size: 14px; margin-top: 20px; margin-bottom: 10px;\">Related Pain Points:</h4>\n        <ul style=\"padding-left: 20px; margin: 0; color: #34495e; font-size: 14px; line-height: 1.6;\">\n            ${relatedPointsHtml}\n        </ul>\n        <h4 style=\"color: #2c3e50; border-bottom: 1px solid #ecf0f1; padding-bottom: 5px; font-size: 14px; margin-top: 20px; margin-bottom: 10px;\">Mentioned Solutions & Workarounds:</h4>\n        <ul style=\"padding-left: 20px; margin: 0; color: #34495e; font-size: 14px; line-height: 1.6;\">\n            ${mentionedSolutionsHtml}\n        </ul>\n        <div style=\"text-align: center; margin-top: 25px;\">\n            <a href=\"${data.url}\" style=\"background-color: #3498db; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 14px;\">\n                View Original Thread\n            </a>\n        </div>\n    </div>\n  `;\n}\n\nconst topic = $(\"Set Config\").first().json.topic[0].toUpperCase() + $(\"Set Config\").first().json.topic.slice(1);\n\n// --- Assemble the Final Email Body ---\nconst fullHtml = `\n<!DOCTYPE html>\n<html lang=\"en\">\n<head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Reddit Pain Point Report</title></head>\n<body style=\"margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f4f7f6;\">\n    <div style=\"max-width: 680px; margin: 20px auto; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);\">\n        <div style=\"text-align: center; border-bottom: 1px solid #e0e0e0; padding-bottom: 15px; margin-bottom: 25px;\">\n            <h1 style=\"color: #2c3e50; margin: 0;\">Reddit Pain Point Digest</h1>\n            <p style=\"color: #7f8c8d; margin: 5px 0 0;\">${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>\n        </div>\n        ${cardsHtml}\n        <div style=\"text-align: center; margin-top: 30px; font-size: 12px; color: #95a5a6;\">\n            <p>Generated by your Market Research Automation Workflow.</p>\n        </div>\n    </div>\n</body>\n</html>\n`;\n\nreturn [{ json: { emailBody: fullHtml, rows: $(\"Get row(s) in sheet\").all() } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -144,
+        304
+      ],
+      "id": "748851e6-9d43-4d63-9ad0-51751a8955c2",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "sendTo": "hello.freetimeAI@gmail.com",
+        "subject": "=[Market Research] ✅ Reddit Pain Point Report",
+        "message": "={{ $json.emailBody }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        416
+      ],
+      "id": "d82cfe26-48fc-43bf-9b85-0cfa5db36a32",
+      "name": "Send a message",
+      "webhookId": "16c68233-1e18-4b5d-95fb-09759453b916",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "advanced": true,
+        "mergeByFields": {
+          "values": [
+            {
+              "field1": "post_id",
+              "field2": "output.id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -816,
+        432
+      ],
+      "id": "f8bdcb7c-c806-4310-b9f5-d928624e11ca",
+      "name": "Merge3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1fStUJMZn13TZaD4BSk_izKpsDZ-LUtm1rEDIWnZ7zBI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "emailed?": "TRUE",
+            "id": "={{ $json.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "datetime",
+              "displayName": "datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_category",
+              "displayName": "post_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_title",
+              "displayName": "post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "primary_pain_point",
+              "displayName": "primary_pain_point",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_validated_by_community",
+              "displayName": "is_validated_by_community",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "related_pain_points",
+              "displayName": "related_pain_points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mentioned_solutions",
+              "displayName": "mentioned_solutions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "business_opportunity_summary",
+              "displayName": "business_opportunity_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "emailed?",
+              "displayName": "emailed?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        976,
+        320
+      ],
+      "id": "c40f379f-6fce-40ae-984e-a51d165611fd",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4U2sXIYrTuhj2I8J",
+          "name": "Google Sheets account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        304,
+        320
+      ],
+      "id": "d9f4171b-bfcf-43ec-85d8-22a32cd28c61",
+      "name": "Merge4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "rows",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        528,
+        320
+      ],
+      "id": "e371dccb-385d-4390-8424-df68a6575fda",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        752,
+        304
+      ],
+      "id": "02c31289-2e6f-4124-ae4e-4cdebc13e4ac",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "subreddit": "={{ $json.topic }}",
+        "limit": "={{ $json.limit }}",
+        "filters": {
+          "category": "new"
+        }
+      },
+      "type": "n8n-nodes-base.reddit",
+      "typeVersion": 1,
+      "position": [
+        -4016,
+        672
+      ],
+      "id": "cc692226-061e-4020-bc5e-26e87154b513",
+      "name": "Get many posts",
+      "credentials": {
+        "redditOAuth2Api": {
+          "id": "HaQ8FAsBthECTlGl",
+          "name": "Reddit account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -5168,
+        688
+      ],
+      "id": "8f312c48-aae9-4f26-a154-211d43fbb649",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "postsWithComments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1968,
+        432
+      ],
+      "id": "b31fa5d1-4227-48af-a984-86d23fc63727",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8db1f408-6606-47a7-9b58-064afc3d43f0",
+              "name": "topics",
+              "value": "=[\"GetDisciplined\", \"selfimprovement\", \"DecidingToBeBetter\", \"productivity\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4944,
+        688
+      ],
+      "id": "3adbbab1-9e83-4884-8edc-3e35bf3ed8df",
+      "name": "Set Topics"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -4240,
+        480
+      ],
+      "id": "42db3150-61ae-4a8d-b452-6e1f31021aa7",
+      "name": "Get Previous Data",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4U2sXIYrTuhj2I8J",
+          "name": "Google Sheets account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a0d0d235-da99-4b6a-a7ed-a51c1e358bc2",
+              "name": "topic",
+              "value": "={{ $json.topics }}",
+              "type": "string"
+            },
+            {
+              "id": "dcbdb2a8-c478-4344-a710-4e7b72285e6f",
+              "name": "source",
+              "value": "reddit thread",
+              "type": "string"
+            },
+            {
+              "id": "bad269a8-9239-467a-98f1-2127a50fa055",
+              "name": "limit",
+              "value": "50",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -4496,
+        688
+      ],
+      "id": "2b975a58-0cf5-4ae7-818a-2e8d1162a12d",
+      "name": "Set Config"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "topics",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -4720,
+        688
+      ],
+      "id": "ed213676-27ea-4fff-8b20-cf052ab3d0f7",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "content": "### Run the workflow once for each topic\n",
+        "height": 80,
+        "width": 336,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4720,
+        848
+      ],
+      "typeVersion": 1,
+      "id": "51758d54-773f-4d9c-9bdc-7b8b7b45620e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all items coming into the node\nconst items = $input.all();\n\n// Create an empty object to act as our hash map (or 'set')\nconst uniqueIdMap = {};\n\n// Loop through each item\nfor (const item of items) {\n  const baseId = item.json.id;\n  \n  // Add the ID as a key in our object.\n  uniqueIdMap[baseId] = true;\n}\n\n// Return a single item containing our ID map.\nreturn [{\n  json: {\n    unique_id_map: uniqueIdMap\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4016,
+        480
+      ],
+      "id": "a2b3a274-6a04-49c2-b1ef-527b7dbf289f",
+      "name": "Build Object Of UniqueIds"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -3792,
+        576
+      ],
+      "id": "933c56ab-545c-4502-a298-a5d6e41920c8",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the single list of all items from the Append merge.\nconst allItems = $input.all();\n\n// The ID map is in the very first item of the array.\nconst uniqueIdMap = allItems[0].json.unique_id_map;\n\n// The Reddit posts are all the other items, from the second item onward.\nconst redditPosts = allItems.slice(1);\n\n// This array will hold only the posts we haven't saved before.\nconst newPosts = [];\n\n// Loop through each Reddit post.\nfor (const post of redditPosts) {\n  // Get the unique ID of the post.\n  // Note: Verify this path is correct for the Reddit node's output.\n  const postId = post.json.id;\n\n  // Check if the post's ID does NOT exist as a key in our map.\n  if (!uniqueIdMap.hasOwnProperty(postId)) {\n    // If it's new, add it to our results array.\n    newPosts.push(post);\n  }\n}\n\n// Return only the new, unique posts. The ID map is now discarded.\nreturn newPosts;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3568,
+        576
+      ],
+      "id": "5899e5ea-f887-4f0c-946e-66d99c5de55e",
+      "name": "Filter Base on Id"
+    },
+    {
+      "parameters": {
+        "jsCode": "const painPointKeywords = [\n  // Emotional & Mental Challenges\n  \"lack of confidence\", \"self doubt\", \"imposter syndrome\",\n  \"feeling stuck\", \"fear of failure\", \"fear of success\",\n  \"perfectionism\", \"overthinking\", \"procrastination\",\n  \"low motivation\", \"burnout\", \"overwhelmed\", \"frustrated\",\n  \n  // Seeking Growth\n  \"how do i stay motivated\", \"how do i change habits\",\n  \"need help staying consistent\", \"looking for purpose\",\n  \"how to handle setbacks\", \"how to build resilience\",\n  \"what's the best mindset\", \"advice on staying positive\",\n  \n  // Limiting Beliefs & Identity\n  \"i'm not good enough\", \"can't do it\", \"i always fail\",\n  \"not smart enough\", \"too old to start\", \"too late for me\",\n  \"bad at sticking with things\", \"never follow through\"\n];\n\nconst painPointKeywords2 = [\n  // Clarity & Direction\n  \"don't know what i want\", \"unclear goals\", \"no direction in life\",\n  \"lost motivation\", \"no clear priorities\", \"feeling lost\",\n  \"can't make decisions\", \"too many options\",\n\n  // Personal Development Struggles\n  \"struggling with self discipline\", \"habit change is hard\",\n  \"can't break bad habits\", \"falling back into old patterns\",\n  \"need accountability\", \"struggle to stay consistent\",\n  \"keep sabotaging myself\",\n\n  // Stress & Life Balance\n  \"work life balance issues\", \"can't switch off\",\n  \"too much stress\", \"always anxious\", \"trouble sleeping\",\n  \"worrying all the time\", \"emotionally drained\",\n\n  // Relationships & Boundaries\n  \"trouble saying no\", \"people pleasing\",\n  \"toxic relationships\", \"no support system\",\n  \"friends don't understand\", \"feeling isolated\"\n];\n\n\nconst posts = $input.all();\n\n// 'items' is the array of data provided by n8n from the previous node.\n// The .filter() method will create a new array containing only the matched items.\n//Remove first item because it is community rules\nconst matchedItems = posts.slice(1).filter((item) => {\n  // Safely get the title and the extracted text.\n  const title = item.json.title ?? '';\n  const extractedText = item.json.extracted_html ?? '';\n  const topic = $(\"Set Config\").first().json.topic\n  const source = $(\"Set Config\").first().json.source\n\n\n  // Combine title and extracted text into one string for searching.\n  // .toLowerCase() makes the search case-insensitive.\n  const combinedText = (title + ' ' + extractedText).toLowerCase();\n\n  // The .some() method checks if AT LEAST ONE keyword is found in the text.\n  // It's efficient because it stops searching as soon as it finds a match.\n  return [ \n    ...painPointKeywords, \n    ...painPointKeywords2, \n  ]\n    .some(keyword => {\n    if (combinedText.includes(keyword)) {\n      item.json.matchedKeywords = keyword;\n      item.json.source = source;\n      item.json.topic = topic\n      return true;\n    }\n    return false; \n  });\n});\n\n// The Code node returns the new array of matched items,\n// which can be passed to the next node in your workflow (e.g., an AI or email node).\nreturn matchedItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3344,
+        576
+      ],
+      "id": "37501a30-a116-4537-8be3-951f89185efa",
+      "name": "Filter By Painpoint Keyword Search",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7eca557c-9e32-4385-9f99-daf649b99042",
+              "name": "comments",
+              "value": "={{ $json.body }}",
+              "type": "string"
+            },
+            {
+              "id": "dc233169-274a-43c1-9367-dd1cb8c0fa2a",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "eba60b46-b816-4e9b-a271-ccf075d76317",
+              "name": "is_submitter",
+              "value": "={{ $json.is_submitter }}",
+              "type": "boolean"
+            },
+            {
+              "id": "ae7d10b8-075c-4a98-8622-50666424a01a",
+              "name": "likes",
+              "value": "={{ $json.likes }}",
+              "type": "string"
+            },
+            {
+              "id": "ea425810-947a-4300-b7bb-63ab6e4d28f8",
+              "name": "link_id",
+              "value": "={{ $json.link_id }}",
+              "type": "string"
+            },
+            {
+              "id": "8d559b39-58df-4e18-87f9-ef279d5a80f3",
+              "name": "score",
+              "value": "={{ $json.score }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -2416,
+        432
+      ],
+      "id": "d4be388a-d485-4c4f-8623-daa334caaef5",
+      "name": "Extract Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = $(\"Filter By Painpoint Keyword Search\").all();\nconst comments = $(\"Extract Data\").all();\n\nconst commentMap = comments.reduce((acc, cur) => {\n  const id = cur?.json?.link_id?.slice(3);\n  if (!id) return acc;\n    if (!(id in acc)) {\n      acc[id] = [cur.json.comments]\n    } else {\n      acc[id].push(cur.json.comments);\n    }\n  return acc;\n}, {})\n\nfor (const post of posts) {\n  if (post.json.id in commentMap) {\n    const comments = commentMap[post.json.id];\n    post.json.comments = comments;\n  } else {\n    post.json.comments = [];\n  } \n}\n\nreturn {postsWithComments: posts}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2192,
+        432
+      ],
+      "id": "d28ed9f8-daf4-408f-bb1a-f72d7c0c57e6",
+      "name": "Combine Post Comments"
+    },
+    {
+      "parameters": {
+        "content": "## For each post we\n- Fetch the comments\n- Append each comment to an array, nested under the post.\n- Split each post out, so we handle each post separately\n- Use Edit Fields Node to join the comments as one chunk of text for the LLM, as well as set other fields",
+        "width": 816,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2640,
+        224
+      ],
+      "typeVersion": 1,
+      "id": "7b2a6453-d968-4afc-bf6d-8720160cf912",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Handle the Email Digest\n- Get the rows where \"emailed?\" is false\n- Build HTMl by iterating over each item.\n- Send the email morening digest in Gmail\n- Mark each row as \"emailed\" true",
+        "height": 176,
+        "width": 1040,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        64,
+        592
+      ],
+      "typeVersion": 1,
+      "id": "fac475a1-fbfd-45fa-9f2c-a5915f872486",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Configuration & Data Fetching:\n### This is where the workflow starts. \n\n- It runs on a schedule\n- Gets the list of subreddits to check\n- Fetches all the new posts since the last run, making sure to de-duplicate against posts it has already processed.\n\n",
+        "height": 240,
+        "width": 768
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5168,
+        416
+      ],
+      "typeVersion": 1,
+      "id": "7e8d1861-5490-48e0-af51-65e4eba1e45f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Content Aggregation & Filtering: \n### This is the data preparation stage. \n\n- The workflow takes the new posts\n- Filters them using the keyword list to find potential pain points\n- Then fetches the top comments for each of those relevant posts.\n\n",
+        "height": 240,
+        "width": 2736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4240,
+        176
+      ],
+      "typeVersion": 1,
+      "id": "10b6fe6b-97b8-4740-b7d6-d4932996d7f4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## AI Analysis Engine: \n### This is the core of the system. \n\n- It takes the combined text from each post and its comments and sends it to the AI model with the custom prompt. \n\n- The AI then categorizes the post (\"Pain Point\" vs. \"Sales Pitch\")\n\n- Then extracts all the key insights into a structured format.\n\n",
+        "height": 240,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1440,
+        208
+      ],
+      "typeVersion": 1,
+      "id": "9cf2e1fe-d05d-4950-bbbe-4d4e8cb10049",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Reporting & Finalization: \n### This is the final output stage.\n \n- The workflow takes the structured data from the AI, saves it to a new row in the Google Sheet for long-term tracking\n- Then uses that same data to generate and send the final, color-coded HTML email digest.",
+        "height": 176,
+        "width": 1520
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -368,
+        112
+      ],
+      "typeVersion": 1,
+      "id": "f10e5387-1238-4a2b-af4f-d3c37e648ede",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54f7b5d3-84f4-4d95-88c6-75227faee27d",
+              "name": "post_content",
+              "value": "={{ $json.json.selftext }}",
+              "type": "string"
+            },
+            {
+              "id": "c446f211-cdd1-4866-a8f2-69ab319e1292",
+              "name": "post_title",
+              "value": "={{ $json.json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "131fc0d9-61b7-44fb-ad7d-d8afcca9940b",
+              "name": "post_id",
+              "value": "={{ $json.json.id }}",
+              "type": "string"
+            },
+            {
+              "id": "05da1e84-1482-498d-9695-f9cbbd9345be",
+              "name": "=link",
+              "value": "=https://www.reddit.com{{ $json.json.permalink }}",
+              "type": "string"
+            },
+            {
+              "id": "13902048-4f91-49e2-b5da-383ce5ac4d05",
+              "name": "source",
+              "value": "={{ $json.json.source }}",
+              "type": "string"
+            },
+            {
+              "id": "82e87fc2-0043-4e6f-b9ba-188e07833ded",
+              "name": "topic",
+              "value": "={{ $json.json.subreddit }}",
+              "type": "string"
+            },
+            {
+              "id": "2cf5bfd4-40d6-4010-aaf7-e914cea2e83d",
+              "name": "comments",
+              "value": "={{ $json.json.comments.join(\"\\n---\\n\") }}",
+              "type": "string"
+            },
+            {
+              "id": "7f5e4fae-8868-451e-82da-9f7fbfe146ef",
+              "name": "title",
+              "value": "={{ $json.json.title }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1744,
+        432
+      ],
+      "id": "e2353e08-2f2b-4b1e-8ff5-f57efee38684",
+      "name": "Build Comments"
+    },
+    {
+      "parameters": {
+        "sendTo": "hello.freetimeAI@gmail.com",
+        "subject": "=[Market Research] ❌ {{ $('Set Config').first().json.topic.toTitleCase() }} Pain Point Report {{ $now.format('yyyy-MM-dd') }}",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>{{ $('Set Config').first().json.topic.toTitleCase() }} Workflow Status</title>\n    <style>\n        /* Basic styles for email compatibility */\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif, \"Apple Color Emoji\", \"Segoe UI Emoji\", \"Segoe UI Symbol\";\n            background-color: #f4f4f7;\n            margin: 0;\n            padding: 0;\n            -webkit-font-smoothing: antialiased;\n            -moz-osx-font-smoothing: grayscale;\n        }\n        .container {\n            background-color: #ffffff;\n            margin: 40px auto;\n            padding: 20px 40px;\n            border-radius: 8px;\n            max-width: 600px;\n            text-align: center;\n            box-shadow: 0 2px 4px rgba(0,0,0,0.1);\n        }\n        h1 {\n            color: #333333;\n            font-size: 24px;\n            font-weight: 600;\n        }\n        p {\n            color: #555555;\n            font-size: 16px;\n            line-height: 1.5;\n        }\n        .footer {\n            margin-top: 20px;\n            font-size: 12px;\n            color: #999999;\n        }\n    </style>\n</head>\n<body>\n    <!-- Main content container -->\n    <div class=\"container\">\n        <h1>Market Research Workflow</h1>\n        <p>No relevant cases were found based on the specified criteria.</p>\n        <p class=\"footer\">This is an automated message from your n8n workflow.</p>\n    </div>\n</body>\n</html>\n",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -2640,
+        656
+      ],
+      "id": "eb5becec-c723-47c6-9b3c-31eefc386b5f",
+      "name": "Message nothing found",
+      "webhookId": "200cda44-6663-4137-b18e-c9c409efa601",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Schedule Trigger": [
+      {
+        "json": {
+          "timestamp": "2025-07-30T04:00:03.008-04:00",
+          "Readable date": "July 30th 2025, 4:00:03 am",
+          "Readable time": "4:00:03 am",
+          "Day of week": "Wednesday",
+          "Year": "2025",
+          "Month": "July",
+          "Day of month": "30",
+          "Hour": "04",
+          "Minute": "00",
+          "Second": "03",
+          "Timezone": "America/New_York (UTC-04:00)"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Get many comments in a post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message nothing found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many comments in a post": {
+      "main": [
+        [
+          {
+            "node": "Extract Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many posts": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Set Topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "Build Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Topics": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Previous Data": {
+      "main": [
+        [
+          {
+            "node": "Build Object Of UniqueIds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Config": {
+      "main": [
+        [
+          {
+            "node": "Get Previous Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get many posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Set Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Object Of UniqueIds": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Filter Base on Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Base on Id": {
+      "main": [
+        [
+          {
+            "node": "Filter By Painpoint Keyword Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter By Painpoint Keyword Search": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Data": {
+      "main": [
+        [
+          {
+            "node": "Combine Post Comments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Post Comments": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Comments": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1bcc0645-6ce5-4569-a18c-e217bb0396d5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  },
+  "id": "21BbhlZ3WMgqpX5G",
+  "tags": []
+}
