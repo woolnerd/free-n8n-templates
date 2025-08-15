@@ -1,0 +1,603 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        208
+      ],
+      "id": "220b9a1b-811d-4929-b4f0-fa594083602b",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bab6317a-9342-4f8f-8c0d-e13670969716",
+              "name": "search_terms",
+              "value": "[\"smallbusinessowner\", \"solopreneur\", \"entrepreneurlife\", \"startuplife\", \"founderlife\"]",
+              "type": "array"
+            },
+            {
+              "id": "e1c31f59-84d3-4afe-8b32-f8407c63fe9d",
+              "name": "min_followers",
+              "value": 500,
+              "type": "number"
+            },
+            {
+              "id": "0fc4c630-b431-4786-9b48-ffffad01d3ff",
+              "name": "results",
+              "value": 10,
+              "type": "number"
+            },
+            {
+              "id": "40681956-bef8-4572-8974-45b6039cb046",
+              "name": "max_followers",
+              "value": 1000,
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        480,
+        208
+      ],
+      "id": "fdc4d5ec-dc97-4818-97f3-63e29c04c9ef",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1360,
+        208
+      ],
+      "id": "091fd667-dd3b-4f6b-b93d-341a09413f98",
+      "name": "Wait1",
+      "webhookId": "173adae1-2db8-43b4-9911-e288ad90ea32"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        928,
+        208
+      ],
+      "id": "a1568c4c-fdf1-47f0-a114-90cbaa717a6b",
+      "name": "Wait2",
+      "webhookId": "9de2c940-0fd1-41f9-8395-417c9a423d5b"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all items from the previous node (e.g., Hashtag Scraper)\nconst allItems = $input.all();\n\n// Create an array of just the unique usernames to avoid duplicate profile scrapes\nconst uniqueUsernames = [...new Set(allItems.map(item => item.json.ownerUsername))];\n\n// Create the final array of profile URLs for the next node (e.g., Apify)\nconst profileUrls = uniqueUsernames.map(name => `https://www.instagram.com/${name}/`);\n\n// 1. Get a direct reference to the first item. We will modify this object.\nconst itemForApify = $input.first();\n\n// 2. Add the 'startUrls' array to the json property of this item.\n// This is the data the next node will use.\nitemForApify.json.startUrls = profileUrls;\n\n// 3. Prepare the original, unmodified data to be passed through on a separate output.\n// This preserves all the initial data for later merging.\nconst originalData = allItems.map(item => ({ json: item.json }));\n\nconst data = {\n  'filters': $(\"Edit Fields1\").all(),\n  'default': [itemForApify],\n  'originalData': originalData,\n}\n\nreturn data;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        624
+      ],
+      "id": "fadabfbc-1fb1-4c1f-915b-c20b3723cba2",
+      "name": "Code"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        912,
+        624
+      ],
+      "id": "c4992cdc-59f5-4749-b0d7-5eef37a13bf6",
+      "name": "Wait3",
+      "webhookId": "675c89da-25f0-40bd-aec3-d5b98799e744"
+    },
+    {
+      "parameters": {
+        "model": "openai/o4-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        448,
+        1168
+      ],
+      "id": "2cc20bbd-c844-4543-8adb-7f34aa10494f",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "12zptvjdKR_R4QIY-FenT4Mz8CK6amgsxI3W8LBZIRu8",
+          "mode": "list",
+          "cachedResultName": "IG Partnership Outreach",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12zptvjdKR_R4QIY-FenT4Mz8CK6amgsxI3W8LBZIRu8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 586856683,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WxIlLydCgVygc_dNpJ6WFCryD-NUurlKTlNC9PO1aVc/edit#gid=586856683"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "ID": "={{ $('IG Profile Scraper Results').item.json.id }}",
+            "Username": "={{ $('IG Profile Scraper Results').item.json.username }}",
+            "Follower Count": "={{ $('Filter By Follower Count').item.json.followersCount }}",
+            "Profile URL": "={{ $('IG Profile Scraper Results').item.json.url }}",
+            "AI-Generated Outreach Message": "={{ $json.output }}"
+          },
+          "matchingColumns": [
+            "ID"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Username",
+              "displayName": "Username",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follower Count",
+              "displayName": "Follower Count",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Profile URL",
+              "displayName": "Profile URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "AI-Generated Outreach Message",
+              "displayName": "AI-Generated Outreach Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        832,
+        944
+      ],
+      "id": "73a7643a-5093-4447-9480-633bbc95cb4b",
+      "name": "Google Sheets",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4U2sXIYrTuhj2I8J",
+          "name": "Google Sheets account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/runs?token=ADD_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"hashtags\": {{ JSON.stringify($json.search_terms) }},\n    \"resultsLimit\": {{ JSON.stringify($json.results) }},\n    \"resultsType\": \"posts\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        736,
+        208
+      ],
+      "id": "69250cae-48e5-4bbf-82d5-ba55f54fcb54",
+      "name": "IG Hashtag Scraper"
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/apify~instagram-hashtag-scraper/runs/last/dataset/token=ADD_API_KEY",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1152,
+        208
+      ],
+      "id": "2f1a2d74-fd78-4328-9091-44c974bacc06",
+      "name": "Hashtag Scraper Results"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~instagram-scraper/runs?token=ADD_API_KEY",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"addParentData\": false,\n    \"directUrls\": {{ JSON.stringify($json.default[0].json.startUrls) }},\n    \"enhanceUserSearchWithFacebookPage\": false,\n    \"isUserReelFeedURL\": false,\n    \"isUserTaggedFeedURL\": false,\n    \"resultsLimit\": 20,\n    \"resultsType\": \"details\",\n    \"searchLimit\": 1\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        688,
+        624
+      ],
+      "id": "1d9020a4-76a5-4f1f-8856-0800afb0147e",
+      "name": "IG Profile Scraper",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.apify.com/v2/acts/apify~instagram-scraper/runs/last/dataset/items?token=ADD_API_KEY",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1120,
+        624
+      ],
+      "id": "fcdf8a93-dfed-4df4-897d-3b5b1edd04b0",
+      "name": "IG Profile Scraper Results"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "11cdb49a-92c0-466a-865c-43b4fa3dfaaf",
+              "leftValue": "={{ $json.followersCount }}",
+              "rightValue": "={{ $('Code').item.json.filters[0].json.min_followers }}",
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "92cccf7e-42a7-48ab-9f68-b9c61faaab23",
+              "leftValue": "={{ $json.followersCount }}",
+              "rightValue": "={{ $('Code').item.json.filters[0].json.max_followers }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1360,
+        624
+      ],
+      "id": "77221df2-d36f-4d66-9a59-f160f3619cec",
+      "name": "Filter By Follower Count"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=**Generalized Prompt for Any User**\n\nYou are **\\[Your Name]**, the founder of **\\[Your Business Name]**. Your mission is to help business owners use AI and automation to reclaim their most valuable asset: their time. Your goal is to draft a personal, direct, and compelling Instagram DM to a potential client or partner.\n\n**Analyze the following data about the business owner/brand:**\n\n* **Username:** `{{ $json.username }}`\n* **Full Name:** `{{ $json.fullName }}`\n* **Follower Count:** `{{ $json.followersCount }}`\n* **Bio:** `{{ $json.biography }}`\n* **A recent post caption:** `{{ $json.latestPosts[0].caption }}`\n\n**Instructions:**\n\n1. Write from your personal perspective using \"I\" and \"my\". You may briefly mention your background or story when it feels natural, especially if it connects to their challenges or goals.\n2. Start with a specific, genuine compliment or observation about their business, a recent post, or their bio. Reference the specific detail you found.\n3. Create a transition that connects a challenge or goal they mentioned to your mission. **Do not use generic phrases like \"This aligns perfectly with\".** Use more natural alternatives such as:\n\n   * \"I saw your post about \\[topic] and it really struck a chord. I started my business for a very similar reason...\"\n   * \"That focus on \\[e.g., streamlining operations] is exactly what I'm all about. My whole mission is to help founders build systems that give them their time back.\"\n   * \"Reading your bio, it sounds like you're focused on scaling smartly. I help business owners do that by automating the backend processes that can eat up so much time.\"\n4. End with a **clear, low-friction call to action.** Choose ONE of the following options that best fits the context:\n\n   * **Problem-focused:** \"I have a couple of ideas for how you could potentially automate parts of that process. Would you be open to a quick 15-minute chat for me to share them? No sales pitch, just genuine brainstorming.\"\n   * **Value-first:** \"I actually help founders with this exact challenge. I put together a quick case study on how I helped a similar business save 10+ hours a week. Mind if I send you the link?\"\n   * **Audit-based:** \"As a specialist in n8n and AI automation, I'd be happy to offer you a complimentary 15-minute 'Automation Audit' on one specific part of your business. Would you be open to that?\"\n5. **Stylistic Rule: Do not use any em dashes (`—`) for punctuation.**\n6. Output only the final DM.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        448,
+        944
+      ],
+      "id": "3d68cda0-8b64-40ff-9be4-b2ef65cf8ec9",
+      "name": "Outreach Agent"
+    },
+    {
+      "parameters": {
+        "content": "## Input Hashtags\n\n",
+        "height": 340,
+        "width": 220
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        432,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "7a417666-cbff-4e41-8f1c-43776e4f8205",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## IG Hashtag Based Scraper via Apify\n",
+        "height": 340,
+        "width": 880
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "a0cef6aa-dcef-43dd-96a4-265dd13babfa",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Scrape IG Profiles based on Hashtag results, filter by follower count",
+        "height": 320,
+        "width": 1120
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        448,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "df24812d-06a8-47af-9a80-3fc4e65c9eaa",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Schedule as often as you like\n\n",
+        "height": 240,
+        "width": 360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        80
+      ],
+      "id": "9309cd7e-7ff1-4175-a6f2-4914239401ff",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -80,
+        160
+      ],
+      "id": "ef3e3fad-ff18-4a63-b1b3-51f3483c4036",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "content": "## ADD API KEY TO ENDPOINTS BEFORE MAKING REQUESTS\n",
+        "height": 96,
+        "width": 736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        720,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "7f8035a3-3f2a-454a-b34c-61064e4a1e06",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Add your details to the prompt.",
+        "height": 80,
+        "width": 464
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -112,
+        960
+      ],
+      "typeVersion": 1,
+      "id": "1d6d98e6-2e20-4e1a-8400-9b73ba4e29b3",
+      "name": "Sticky Note4"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "IG Hashtag Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait2": {
+      "main": [
+        [
+          {
+            "node": "Hashtag Scraper Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "IG Profile Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait3": {
+      "main": [
+        [
+          {
+            "node": "IG Profile Scraper Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Outreach Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG Hashtag Scraper": {
+      "main": [
+        [
+          {
+            "node": "Wait2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hashtag Scraper Results": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG Profile Scraper": {
+      "main": [
+        [
+          {
+            "node": "Wait3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG Profile Scraper Results": {
+      "main": [
+        [
+          {
+            "node": "Filter By Follower Count",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter By Follower Count": {
+      "main": [
+        [
+          {
+            "node": "Outreach Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Outreach Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
