@@ -1,0 +1,2510 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aed5a7ce-9450-46eb-b947-7cebec07c2ed",
+              "leftValue": "={{ $json.theme }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "84509135-0971-448f-bedb-746b5777fd37",
+              "leftValue": "={{ $json.post_to_social }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -272,
+        -16
+      ],
+      "id": "6f1882a4-3cf8-4e7d-b667-11d4d39acf58",
+      "name": "Filter By Selected"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-pro",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        336
+      ],
+      "id": "619f815a-7fef-40f1-99dd-e4719ed4fb52",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"post\": \"string\",         \n  \"post_title\": \"string\",   \n  \"post_theme\": \"string\"\n}\n"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        208,
+        336
+      ],
+      "id": "878957cf-f1b0-4b0f-83e4-24a8e7cbaff4",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "social-media-memory"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        336
+      ],
+      "id": "83178988-1862-413e-b43e-70a1ea3dd412",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        -16
+      ],
+      "id": "ead71c4f-64bc-42ab-ac6b-7c0bf70fea86",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "5cf3ccf23f0aa1305221eaae7d45c09e2b9ede359f208ff6afb8358a6651f25a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Social Media Schedule LinkedIn"
+        },
+        "start": "={{ $json.scheduled_date.toDateTime().plus(4, 'hours') }}",
+        "end": "={{ $json.scheduled_date.toDateTime().plus(5, 'hours') }}",
+        "additionalFields": {
+          "description": "={{ $json.generated_post_text }}",
+          "location": "={{ $json.platform }}",
+          "summary": "={{ $json.generated_post_title }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        768,
+        1040
+      ],
+      "id": "c222432d-26a6-419f-84ff-17085377844c",
+      "name": "Create an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "m2QOSYrWKNTKRKul",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        1744
+      ],
+      "id": "4f8aef3d-626c-45f3-87bf-cc18b55a00a4",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "5cf3ccf23f0aa1305221eaae7d45c09e2b9ede359f208ff6afb8358a6651f25a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Social Media Schedule LinkedIn"
+        },
+        "eventId": "={{ $json.id }}",
+        "options": {
+          "sendUpdates": "none"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -240,
+        1920
+      ],
+      "id": "2da5549a-fd45-411e-8ba4-8c7c23ac1268",
+      "name": "Delete an event",
+      "executeOnce": false,
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "m2QOSYrWKNTKRKul",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "5cf3ccf23f0aa1305221eaae7d45c09e2b9ede359f208ff6afb8358a6651f25a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Social Media Schedule LinkedIn"
+        },
+        "timeMin": "={{ $now.minus(1, 'day') }}",
+        "timeMax": "={{ $now.plus(6, 'months') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        1920
+      ],
+      "id": "0f5ecce8-5e07-463a-ad5e-554962c8ceb6",
+      "name": "Get many events",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "m2QOSYrWKNTKRKul",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        336,
+        1056
+      ],
+      "id": "5528df9f-2fe3-43ff-baae-3fe38f1f5ab0",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8a160214-8e1d-4819-99e7-ec6da6693a37",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        128,
+        1072
+      ],
+      "id": "b03377d2-e168-4af9-b39d-50188b330ea3",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        320,
+        1424
+      ],
+      "id": "1f26593d-8351-4c9c-b2d6-2f209be465ce",
+      "name": "No Operation, do nothing"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -432,
+        1568
+      ],
+      "id": "14ca102f-de14-4e0d-a651-5f9597c4bb54",
+      "name": "Get row(s) in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "scheduled": "true",
+            "id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "datetime",
+              "displayName": "datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_category",
+              "displayName": "post_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_title",
+              "displayName": "post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_to_social",
+              "displayName": "post_to_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "primary_pain_point",
+              "displayName": "primary_pain_point",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_validated_by_community",
+              "displayName": "is_validated_by_community",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "related_pain_points",
+              "displayName": "related_pain_points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mentioned_solutions",
+              "displayName": "mentioned_solutions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "business_opportunity_summary",
+              "displayName": "business_opportunity_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "emailed?",
+              "displayName": "emailed?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "full_original_post",
+              "displayName": "full_original_post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_comments",
+              "displayName": "post_comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "scheduled",
+              "displayName": "scheduled",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -240,
+        1568
+      ],
+      "id": "488c0871-7ef5-4f1e-a1ef-05a4cbc652d0",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -432,
+        1728
+      ],
+      "id": "b2ec19b3-6236-4f30-a353-4dac58043286",
+      "name": "Get row(s) in sheet4",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "DRAFT",
+            "id": "={{ $json.id }}",
+            "scheduled_date": "NULL"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "op_pain_point_summary",
+              "displayName": "op_pain_point_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source_url",
+              "displayName": "source_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_title",
+              "displayName": "generated_post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_theme",
+              "displayName": "generated_post_theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_text",
+              "displayName": "generated_post_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tone_used",
+              "displayName": "tone_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_generated_at",
+              "displayName": "last_generated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "scheduled_date",
+              "displayName": "scheduled_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -240,
+        1728
+      ],
+      "id": "96def3cd-f95b-4b21-baf2-bc4a82f38fa5",
+      "name": "Append or update row in sheet3",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Reset workflow for testing\n- useful for clearing assigned times\n- clears calendar events\n",
+        "height": 768,
+        "width": 704
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -720,
+        1424
+      ],
+      "typeVersion": 1,
+      "id": "b3278054-26c1-422f-9cd2-0e971a3d148f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "person": "NgOn7FldeB",
+        "text": "={{ $json.generated_post_title }}\n\n{{ $json.generated_post_text }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.linkedIn",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        784
+      ],
+      "id": "d3441f3c-364e-4e99-9c8e-968b79efd9b2",
+      "name": "Create a post",
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "8yRJbrBtBxflRGkd",
+          "name": "LinkedIn account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "value": "5cf3ccf23f0aa1305221eaae7d45c09e2b9ede359f208ff6afb8358a6651f25a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Social Media Schedule LinkedIn"
+        },
+        "eventId": "={{ $json.event_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        608,
+        784
+      ],
+      "id": "ffa8e48c-c690-4fda-ae7a-b1ffc4016bb8",
+      "name": "Get an event",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "m2QOSYrWKNTKRKul",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 7,
+              "triggerAtHour": 7
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        -16
+      ],
+      "id": "2b5a6dc8-9648-4786-b299-1bc418972ed1",
+      "name": "Weekly Content Gen Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "scheduled",
+              "lookupValue": "false"
+            }
+          ]
+        },
+        "combineFilters": "OR",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -496,
+        -16
+      ],
+      "id": "24d8ca59-c4e7-4645-ad3d-03100571ebfc",
+      "name": "Get All New Pain Points",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a social media assistant helping to turn real-world business pain points into engaging posts. Your input will be a single paint point from a reddit_post. You will receive the full post, and, if available, reddit_post_comments. Use the writing_samples to determine tone.\n\n\nYour job:\n1. Identify the underlying theme.\n2. Create one concise, insightful post that empathizes and offers a perspective or solution.\n3. Check previously generated posts, and avoid using the same language.\n\nMake the tone:\n- Direct, professional but approachable\n- Not overly salesy\n- Optimized for LinkedIn/Twitter style (punchy, readable, engaging).\n\nStyle notes:\n- Never use em dashes\n- Format into logical paragraphs based on social platform.\n- Format the post text for readability:\n    - Use short paragraphs (1–3 sentences).\n    - Add line breaks between ideas.\n    - Use occasional emoji or bullets for emphasis.\n\n<begin writing_samples>\n\n--\n\nSample 1 — On Procrastination\n\nYou don’t have a procrastination problem. You have a “my brain thinks everything needs to be perfect before I start” problem.\n\nTry this: pick the smallest, messiest first step you can. Write the sloppy email draft. Do the 5 pushups instead of a full workout. Start before you’re “ready.”\n\nPerfect is a lie. Progress is the win.\n \n--\nSample 2 — On Impostor Syndrome\n\nIf you’re waiting to “feel ready” before you put yourself out there… spoiler alert: you’ll be waiting forever.\n\nEven Beyoncé gets nervous before going on stage. (Yes, that Beyoncé).\n\nBeing scared doesn’t mean you’re not capable. It just means you’re human. Take the leap anyway — your future self will be very grateful.\n\n-- \nSample 3 — On Overthinking\n\nOverthinking is like rocking in a rocking chair. Lots of motion, zero forward progress.\n\nNext time you catch yourself spiraling, try this: set a 5-minute timer, make the best decision you can, and move.\n\nAction beats rumination every single time. And if it doesn’t? Well, at least you’re building leg muscles with all that mental rocking.\n\n--\n</end writing_samples>\n\nSchema:\n{\n  \"post\": string,         // the full social post\n  \"post_title\": string,   // a short title\n  \"post_theme\": string    // the theme name\n}\n\n---\n\nINPUT:\nreddit_post: {{ $json.full_original_post }}\nreddit_post_comments: {{ $json.post_comments }}\n\n",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        16,
+        112
+      ],
+      "id": "90897b9d-18e2-4495-b61a-dec3273432b1",
+      "name": "Social Media Post Creator Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "generated_post_text": "={{ $json.output.post }}",
+            "status": "DRAFT",
+            "created_at": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "platform": "linkedin",
+            "last_generated_at": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "scheduled_date": "=NULL",
+            "id": "={{ $json.id }}",
+            "source_url": "={{ $json.url }}",
+            "op_pain_point_summary": "={{ $json.primary_pain_point }}",
+            "generated_post_title": "={{ $json.output.post_title }}",
+            "generated_post_theme": "={{ $json.output.post_theme }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "op_pain_point_summary",
+              "displayName": "op_pain_point_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "source_url",
+              "displayName": "source_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "generated_post_title",
+              "displayName": "generated_post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "generated_post_theme",
+              "displayName": "generated_post_theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "generated_post_text",
+              "displayName": "generated_post_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tone_used",
+              "displayName": "tone_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "last_generated_at",
+              "displayName": "last_generated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "scheduled_date",
+              "displayName": "scheduled_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        640,
+        -16
+      ],
+      "id": "7b124082-4b5f-4e6a-b42f-5504ee9575f5",
+      "name": "Add Content To Schedule",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI",
+          "mode": "list",
+          "cachedResultName": "Client Pain Point Market Research Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WgWoc1g8FLjkpS5UByABKFplnpUW9VFEpEDdFB2vkwI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "scheduled": "true"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "datetime",
+              "displayName": "datetime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source",
+              "displayName": "source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_category",
+              "displayName": "post_category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_title",
+              "displayName": "post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_to_social",
+              "displayName": "post_to_social",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "theme",
+              "displayName": "theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "primary_pain_point",
+              "displayName": "primary_pain_point",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "is_validated_by_community",
+              "displayName": "is_validated_by_community",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "related_pain_points",
+              "displayName": "related_pain_points",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "mentioned_solutions",
+              "displayName": "mentioned_solutions",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "business_opportunity_summary",
+              "displayName": "business_opportunity_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "emailed?",
+              "displayName": "emailed?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "full_original_post",
+              "displayName": "full_original_post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_comments",
+              "displayName": "post_comments",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "scheduled",
+              "displayName": "scheduled",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        864,
+        -16
+      ],
+      "id": "10b90c33-96bb-405c-9ef8-fb57c5f22095",
+      "name": "Mark Pain Point As Scheduled",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Content Generation Workflow Runs Weekly\n\n- **Gets Paint Points that have are new (ie, haven't been scheduled for a post)**\n- **Filter by if `post_to_social` is true.**\n- **Pass the post and comments to the LLM to with specific instructions and few-shot examples for author's style**\n- **Add the generated post to the Content Schedule Google Sheet**\n- **Mark the Pain Point row as scheduled to prevent reposting on future runs**\n",
+        "height": 224,
+        "width": 1024
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -752,
+        -320
+      ],
+      "typeVersion": 1,
+      "id": "ec9f6002-fdc0-4fc9-8356-21e9fe9ec724",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Scheduled Post Workflow, checks for posts every 15mins\n- **Checks the status and branches if a post's schedule post time is in the past**\n  - if FALSE, run our Code node to find the next opening in our schedule. Currently, we are interested in posting M, W, F 9:00AM\n  - loop in batches of 10 (reduceds API calls), update Sheet with `scheduled_date`\n  - fetch all scheduled\n  - add to Google Calendar for a visual\n\n\n- if TRUE, then we have a post that is ready to go live\n - Post to linked\n - update the Sheet\n - mark google calendar event as POSTED\n\n\n",
+        "height": 304,
+        "width": 912,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        496
+      ],
+      "typeVersion": 1,
+      "id": "745693dd-fe33-4929-a085-ddc3e308e8b3",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        880
+      ],
+      "id": "1e1edca5-dc5d-4480-96d3-1d6fea92daf7",
+      "name": "Every 15min Post Schedule"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -480,
+        880
+      ],
+      "id": "24ee53c1-3c27-460e-9012-f72f4fcd8b6f",
+      "name": "Get All Rows From Content Schedule",
+      "executeOnce": true,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Format date as \"YYYY-MM-DD HH:mm:ss\" in *local* time (zero-padded)\nfunction formatLocal(date) {\n  const y = date.getFullYear();\n  const m = String(date.getMonth() + 1).padStart(2, \"0\");\n  const d = String(date.getDate()).padStart(2, \"0\");\n  const h = String(date.getHours()).padStart(2, \"0\");      // <- padded\n  const min = String(date.getMinutes()).padStart(2, \"0\");\n  const s = \"00\";\n  return `${y}-${m}-${d} ${h}:${min}:${s}`;\n}\n\n// Next available Mon/Wed/Fri @ 09:00 local, skipping any date already used\nfunction getNextSlots(count, taken) {\n  const slots = [];\n  const takenDates = new Set(\n    (taken || [])\n      .filter(Boolean)\n      .map(d => String(d).slice(0,10)) // compare by YYYY-MM-DD only\n  );\n\n  let cursor = new Date();\n  cursor.setHours(9, 0, 0, 0); // 09:00 local today\n\n  while (slots.length < count) {\n    const dow = cursor.getDay(); // 0=Sun..6=Sat\n    if ([1,3,5].includes(dow)) {\n      const candidate = formatLocal(cursor);\n      const dayKey = candidate.slice(0,10);\n      if (!takenDates.has(dayKey)) {\n        slots.push(candidate);    // e.g. \"2025-08-20 09:00:00\"\n      }\n    }\n    cursor.setDate(cursor.getDate() + 1);\n    cursor.setHours(9, 0, 0, 0); // keep time fixed\n  }\n  return slots;\n}\n\n// --- Inputs from other nodes ---\nconst posts = $('Get All Rows From Content Schedule').all().map(i => i.json);    \nconst draftPosts = posts.filter(post => post.status === 'DRAFT');\nconst scheduledPosts = posts.filter(post => post.status === 'SCHEDULED');\n\nconsole.log(posts)\n\n// status=approved\nconst taken = scheduledPosts.map(p => p.scheduled_date); // status=scheduled/published\n\n\nconst slots = getNextSlots(posts.length, taken);\n\n// Assign\nconst scheduled = draftPosts.map((post, i) => ({\n  ...post,\n  scheduled_date: slots[i],   // \"YYYY-MM-DD HH:mm:ss\" (local)\n  status: \"scheduled\"\n}));\n\nreturn scheduled.map(s => ({ json: s }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        1072
+      ],
+      "id": "9f80c77d-c04b-4a80-8dee-e46444a26299",
+      "name": "Find Next Available Scheduling Slot",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $json.id }}",
+            "scheduled_date": "={{ $json.scheduled_date}}",
+            "status": "SCHEDULED"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "op_pain_point_summary",
+              "displayName": "op_pain_point_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source_url",
+              "displayName": "source_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_title",
+              "displayName": "generated_post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_theme",
+              "displayName": "generated_post_theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_text",
+              "displayName": "generated_post_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tone_used",
+              "displayName": "tone_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_generated_at",
+              "displayName": "last_generated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "scheduled_date",
+              "displayName": "scheduled_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        336,
+        1200
+      ],
+      "id": "8cb560ba-f9a7-4350-b8fe-a0feea6b9f39",
+      "name": "Update Row To Be Scheduled",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "SCHEDULED"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        576,
+        1040
+      ],
+      "id": "9ab07a16-387c-432c-b5ba-66f0a7331bac",
+      "name": "Get Scheduled Rows For Cal",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get Scheduled Rows For Cal').item.json.id }}",
+            "event_id": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "op_pain_point_summary",
+              "displayName": "op_pain_point_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source_url",
+              "displayName": "source_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_title",
+              "displayName": "generated_post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_theme",
+              "displayName": "generated_post_theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_text",
+              "displayName": "generated_post_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tone_used",
+              "displayName": "tone_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_generated_at",
+              "displayName": "last_generated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "scheduled_date",
+              "displayName": "scheduled_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        960,
+        1040
+      ],
+      "id": "c8b3b204-32f8-41a0-b259-c394ac1409f9",
+      "name": "Add Cal Event Id",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "PUBLISHED",
+            "id": "={{ $('Get All Rows From Content Schedule').item.json.id }}",
+            "post_link": "=https://www.linkedin.com/feed/update/{{ $json.urn }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "op_pain_point_summary",
+              "displayName": "op_pain_point_summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "source_url",
+              "displayName": "source_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_title",
+              "displayName": "generated_post_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_theme",
+              "displayName": "generated_post_theme",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "generated_post_text",
+              "displayName": "generated_post_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "tone_used",
+              "displayName": "tone_used",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "last_generated_at",
+              "displayName": "last_generated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "scheduled_date",
+              "displayName": "scheduled_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "curator_notes",
+              "displayName": "curator_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "post_link",
+              "displayName": "post_link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        160,
+        784
+      ],
+      "id": "b2770b03-0fd1-47d9-90c9-1f0553880c82",
+      "name": "Update Status, Add Post Link",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU",
+          "mode": "list",
+          "cachedResultName": "Curated Social Content Schedule",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1JS5BQOlnoknZKs8ygSOlrHqLvVNH3r-achBbblxQiFU/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "id",
+              "lookupValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        384,
+        784
+      ],
+      "id": "bc7c6cad-1987-4eeb-90ed-db65afabe93d",
+      "name": "Get Row Data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "5cf3ccf23f0aa1305221eaae7d45c09e2b9ede359f208ff6afb8358a6651f25a@group.calendar.google.com",
+          "mode": "list",
+          "cachedResultName": "Social Media Schedule LinkedIn"
+        },
+        "eventId": "={{ $json.id }}",
+        "updateFields": {
+          "summary": "=POSTED - {{ $json.summary }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        784
+      ],
+      "id": "26e6f510-e9cf-4dda-9ac7-23d1ba06477f",
+      "name": "Update an event summary as POSTED",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "m2QOSYrWKNTKRKul",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9eefc173-88b0-4597-8d57-0a70b9d1d8fd",
+              "leftValue": "={{ $json.scheduled_date !== 'NULL' && $json.scheduled_date.toDateTime() < $now}}",
+              "rightValue": "={{ $now }}",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -288,
+        880
+      ],
+      "id": "d0ce6b75-5e53-4373-b24b-2bd6284a314d",
+      "name": "If1"
+    }
+  ],
+  "connections": {
+    "Filter By Selected": {
+      "main": [
+        [
+          {
+            "node": "Social Media Post Creator Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Social Media Post Creator Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Social Media Post Creator Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Social Media Post Creator Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Add Content To Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event": {
+      "main": [
+        [
+          {
+            "node": "Add Cal Event Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet4",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get many events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many events": {
+      "main": [
+        [
+          {
+            "node": "Delete an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Get Scheduled Rows For Cal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Row To Be Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        []
+      ]
+    },
+    "Get row(s) in sheet4": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet3": {
+      "main": [
+        []
+      ]
+    },
+    "Create a post": {
+      "main": [
+        [
+          {
+            "node": "Update Status, Add Post Link",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an event": {
+      "main": [
+        [
+          {
+            "node": "Update an event summary as POSTED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Weekly Content Gen Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get All New Pain Points",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All New Pain Points": {
+      "main": [
+        [
+          {
+            "node": "Filter By Selected",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Social Media Post Creator Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Add Content To Schedule": {
+      "main": [
+        [
+          {
+            "node": "Mark Pain Point As Scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Every 15min Post Schedule": {
+      "main": [
+        [
+          {
+            "node": "Get All Rows From Content Schedule",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Rows From Content Schedule": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Next Available Scheduling Slot": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Row To Be Scheduled": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Scheduled Rows For Cal": {
+      "main": [
+        [
+          {
+            "node": "Create an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status, Add Post Link": {
+      "main": [
+        [
+          {
+            "node": "Get Row Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Row Data": {
+      "main": [
+        [
+          {
+            "node": "Get an event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create a post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find Next Available Scheduling Slot",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
