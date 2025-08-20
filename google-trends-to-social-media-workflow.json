@@ -1,0 +1,988 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "person": "yfIFTq8dc6",
+        "text": "={{ $('AI Social Media Writer').item.json.output.linkedin }}",
+        "additionalFields": {}
+      },
+      "id": "032ac9c4-8d7b-4f5c-b6da-59dcad1bf670",
+      "name": "LinkedIn1",
+      "type": "n8n-nodes-base.linkedIn",
+      "position": [
+        -1264,
+        32
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "linkedInOAuth2Api": {
+          "id": "juYj3pG7jWuvgNIh",
+          "name": "LinkedIn account FreetimeAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            },
+            {
+              "triggerAtHour": 18
+            }
+          ]
+        }
+      },
+      "id": "4e909f51-42ad-41c5-a9d6-150682a63014",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [
+        -3568,
+        32
+      ],
+      "typeVersion": 1.2
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"most-trending\": {\n\n    \"#1\": { \n\n      \"query\":\"{{ $json.related_queries.top[0].query }}\",\n      \"score\":\"{{ $json.related_queries.top[0].extracted_value }}\"\n\n    },\n\n\n    \"#2\": { \n\n      \"query\":\"{{ $json.related_queries.top[1].query }}\",\n      \"score\":\"{{ $json.related_queries.top[1].extracted_value }}\"\n\n    }\n  }\n}",
+        "options": {}
+      },
+      "id": "a3afab18-7a42-4bf9-94f5-5d91e5cca331",
+      "name": "2 Most Trending",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        -3120,
+        -80
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the top array from your JSON\nconst topItems = $('SerpApi').first().json.related_queries.top;\n\n// Filter the items to only include those with extracted_value > 30\nconst filtered = topItems.filter(item => item.extracted_value > 30);\n\n// Map the filtered items to their query values and join them with commas\nconst resultString = filtered.map(item => item.query).join(', ');\n\n// Return the result in a new JSON property\nreturn [{ json: { result: resultString } }];\n"
+      },
+      "id": "3d844aeb-27ee-46a8-8b7e-47f6ea33056b",
+      "name": "High search volume keywords",
+      "type": "n8n-nodes-base.code",
+      "position": [
+        -2896,
+        -80
+      ],
+      "typeVersion": 2
+    },
+    {
+      "parameters": {
+        "content": "## Find Trend\n\n",
+        "height": 240,
+        "width": 400
+      },
+      "id": "a4854969-e235-424a-89cd-0d95ee35ee46",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3376,
+        -160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## High Volume Keywords\n\n",
+        "height": 240,
+        "width": 200
+      },
+      "id": "061ec27e-1fd9-4333-8317-035f3f301dac",
+      "name": "Sticky Note1",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2944,
+        -160
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Choosing Blog Topic\n\n\n",
+        "height": 580,
+        "width": 340
+      },
+      "id": "ca9b9c9c-2894-4175-9148-ee90cde4c06b",
+      "name": "Sticky Note2",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2720,
+        -304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Research\n\n\n",
+        "height": 580,
+        "width": 320
+      },
+      "id": "b8f65f93-ea67-4247-997f-02fe6818f7a6",
+      "name": "Sticky Note3",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2320,
+        -304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Multi Social Media Posting",
+        "height": 840,
+        "width": 620
+      },
+      "id": "928ba511-d638-44e5-be16-6a379fdd2e3f",
+      "name": "Sticky Note4",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1504,
+        -464
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "## Status update",
+        "height": 260
+      },
+      "id": "c59eaf1d-986d-4f3d-9a7a-d5b5af77b181",
+      "name": "Sticky Note5",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -848,
+        -176
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "operation": "google_trends",
+        "q": "generative ai",
+        "additionalFields": {
+          "hl": "en",
+          "geo": "US",
+          "data_type": "RELATED_QUERIES",
+          "date": "={{ $now.minus({ days: 3 }).format('yyyy-MM-dd') }} {{ $now.format('yyyy-MM-dd') }}",
+          "output": "json"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApi",
+      "typeVersion": 1,
+      "position": [
+        -3344,
+        -80
+      ],
+      "id": "b6661eed-fa61-409f-a615-6adcfb4d4999",
+      "name": "SerpApi",
+      "credentials": {
+        "serpApi": {
+          "id": "kHsgJ8mFB8EwzQZZ",
+          "name": "SerpApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2592,
+        144
+      ],
+      "id": "48b35957-0a7d-4d2b-8c16-91a60b757d1e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3568,
+        -176
+      ],
+      "id": "7d4127d0-1494-4cfe-8e56-8a8fd0b1d7b6",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{  \n  \"linkedin\":   \"<your LinkedIn post here>\",  \n  \"facebook\":   \"<your Facebook post here>\",  \n  \"instagram\":  \"<your Instagram caption + hashtags>\",  \n  \"x\":          \"<your X post here>\"  \n}  "
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -2160,
+        144
+      ],
+      "id": "5d0a0b0e-9125-4808-85a6-476ac9a392ea",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2272,
+        144
+      ],
+      "id": "f776b284-915d-4139-9ed6-eb473f5771c1",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "chatId": "=7634484349",
+        "message": "=LinkedIn:\n\n{{ $('AI Social Media Writer').item.json.output.linkedin }}\n\nFacebook:\n\n{{ $('AI Social Media Writer').item.json.output.facebook }}\n\nInstagram:\n\n{{ $('AI Social Media Writer').item.json.output.instagram }}\n\nX:  \n\n{{ $('AI Social Media Writer').item.json.output.x }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1712,
+        -80
+      ],
+      "id": "6fd9c73f-2b9d-43f7-a35d-d6a501d671fa",
+      "name": "Telegram",
+      "webhookId": "4feab26c-bbaa-4607-ad6e-107b85ac33b5",
+      "credentials": {
+        "telegramApi": {
+          "id": "SKle6IpJMRnSP4mA",
+          "name": "Telegram CrossPoster"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1KT4L5OCoHcGoFoTSj2uQAdilRs8NQklmRaSpA3zQtLQ",
+          "mode": "list",
+          "cachedResultName": "SerpAPI Social Content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KT4L5OCoHcGoFoTSj2uQAdilRs8NQklmRaSpA3zQtLQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KT4L5OCoHcGoFoTSj2uQAdilRs8NQklmRaSpA3zQtLQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Search ID": "={{ $('SerpApi').item.json.search_metadata.id }}",
+            "Date": "={{ $('SerpApi').item.json.search_metadata.created_at }}",
+            "Search Words": "={{ $('SerpApi').item.json.search_parameters.q }}",
+            "Top Two Trends": "={{ $('2 Most Trending').item.json['most-trending']['#1'].query }}, {{ $('2 Most Trending').item.json['most-trending']['#2'].query }}",
+            "LinkedIn": "={{ $json.output.linkedin }}",
+            "Facebook": "={{ $json.output.facebook }}",
+            "Instagram": "={{ $json.output.instagram }}",
+            "X": "={{ $json.output.x }}",
+            "Posted": "N/A"
+          },
+          "matchingColumns": [
+            "Search ID"
+          ],
+          "schema": [
+            {
+              "id": "Search ID",
+              "displayName": "Search ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Top Two Trends",
+              "displayName": "Top Two Trends",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Search Words",
+              "displayName": "Search Words",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn",
+              "displayName": "LinkedIn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "X",
+              "displayName": "X",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Posted",
+              "displayName": "Posted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1904,
+        -80
+      ],
+      "id": "95587dcf-931d-4533-a29f-aa0c2f1cf083",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1KT4L5OCoHcGoFoTSj2uQAdilRs8NQklmRaSpA3zQtLQ",
+          "mode": "list",
+          "cachedResultName": "SerpAPI Social Content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KT4L5OCoHcGoFoTSj2uQAdilRs8NQklmRaSpA3zQtLQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1KT4L5OCoHcGoFoTSj2uQAdilRs8NQklmRaSpA3zQtLQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Search ID": "={{ $('SerpApi').item.json.search_metadata.id }}",
+            "Posted": "={{ $now.format('MM-dd-yyyy tt') }}"
+          },
+          "matchingColumns": [
+            "Search ID"
+          ],
+          "schema": [
+            {
+              "id": "Search ID",
+              "displayName": "Search ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Top Two Trends",
+              "displayName": "Top Two Trends",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Search Words",
+              "displayName": "Search Words",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn",
+              "displayName": "LinkedIn",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Facebook",
+              "displayName": "Facebook",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Instagram",
+              "displayName": "Instagram",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "X",
+              "displayName": "X",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Posted",
+              "displayName": "Posted",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -768,
+        -80
+      ],
+      "id": "1c6ccfdd-294a-4b27-bff8-b2b5ddfc1567",
+      "name": "Google Sheets1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -1024,
+        -80
+      ],
+      "id": "bd76e6ae-1e98-4cc2-9abd-2956fa72cfc7",
+      "name": "Wait",
+      "webhookId": "6bcb4730-a694-4eaf-bc7e-8f621f7e7647"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a senior social media strategist. You will receive a brief 'premise' for a social media post. MAKE SURE YOU INCLUDE THE PREMISE. We are posting on behalf of the ai automation company FreetimeAI. Their website is https://FreetimeAI.dev. Expand that premise into four complete posts, one per platform: LinkedIn, Facebook, Instagram, and X. Observe these tonal and formatting guidelines:\n\n• LinkedIn  \n  – Tone: Professional, insightful, slightly formal  \n  – Length: ~150–250 words  \n  – Include a clear business takeaway or call-to-action ('Let’s discuss in the comments'). \n\n• Facebook  \n  – Tone: Friendly, conversational, engaging  \n  – Length: ~100–150 words  \n  – Include a question or prompt to drive comments. Use 1–2 emojis.  \n\n• Instagram  \n  – Tone: Visual and upbeat  \n  – Length: ~50–100 words in caption, plus 5–10 relevant hashtags  \n  – Suggest two emoji, line breaks for readability, and a one-sentence call-to-action ('Save this post,' 'Tag a friend').  \n\n• X  \n  – Tone: Concise, punchy, news-style  \n  – Length: ≤280 characters  \n  – Use 1–2 hashtags, 1 emoji max, and a link or mention if relevant.  \n\nInput:  \nPremise: '{{ $json.output }}'\n\nOutput exactly as valid JSON with these four keys:  \n{  \n  \"linkedin\":   \"<your LinkedIn post here>\",  \n  \"facebook\":   \"<your Facebook post here>\",  \n  \"instagram\":  \"<your Instagram caption + hashtags>\",  \n  \"x\":          \"<your X post here>\"  \n}  \nDo not output any additional text.'",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "="
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -2304,
+        -80
+      ],
+      "id": "828117c9-8e1a-458a-8f75-f67ea9e326f6",
+      "name": "AI Social Media Writer",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "text": "={{ $('AI Social Media Writer').item.json.output.x }}",
+        "additionalFields": {}
+      },
+      "id": "876d9c6f-f5b4-4dc0-acfa-7c3859025c2c",
+      "name": "X HelloFreetimeAI",
+      "type": "n8n-nodes-base.twitter",
+      "position": [
+        -1264,
+        224
+      ],
+      "typeVersion": 2,
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "NVVtW0K8fLwv26OJ",
+          "name": "X account HelloFreetimeAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "663171296883653",
+        "edge": "photos",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "url",
+                "value": "https://n8n-assets-for-automation.s3.us-east-1.amazonaws.com/image_assets/cross_poster/2025-06-03/AQADy64xGxRa-UV91748970637796.jpg"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $('AI Social Media Writer').item.json.output.instagram }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        -1264,
+        -384
+      ],
+      "id": "4f613e0d-4161-4366-a508-3ef64d6beaaf",
+      "name": "Facebook Graph API Facebook",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "AuWHECvOhy3QzbNm",
+          "name": "Facebook Graph FB FreetimeAI Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "17841474981654940",
+        "edge": "media",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "image_url",
+                "value": "https://n8n-assets-for-automation.s3.us-east-1.amazonaws.com/image_assets/business_assets/images/freetimeAI-logo.png"
+              },
+              {
+                "name": "caption",
+                "value": "={{ $('AI Social Media Writer').item.json.output.instagram }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        -1424,
+        -128
+      ],
+      "id": "2ace2971-3b10-457c-8854-553865844351",
+      "name": "Instagram get container ID",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "AuWHECvOhy3QzbNm",
+          "name": "Facebook Graph FB FreetimeAI Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpRequestMethod": "POST",
+        "graphApiVersion": "v22.0",
+        "node": "17841474981654940",
+        "edge": "media_publish",
+        "options": {
+          "queryParameters": {
+            "parameter": [
+              {
+                "name": "creation_id",
+                "value": "={{ $json.id }}"
+              }
+            ]
+          }
+        }
+      },
+      "id": "fb9c482c-aa70-4850-97ca-a2bfe273b0b7",
+      "name": "Post to Instagram FreetimeAI",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "position": [
+        -1264,
+        -176
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "AuWHECvOhy3QzbNm",
+          "name": "Facebook Graph FB FreetimeAI Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Log and Get Approval \n\n\n",
+        "height": 580,
+        "width": 380
+      },
+      "id": "25a33e7f-05d4-4e94-8aaf-e270e50a5fba",
+      "name": "Sticky Note6",
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1936,
+        -304
+      ],
+      "typeVersion": 1
+    },
+    {
+      "parameters": {
+        "content": "# Scheduled Cross Platform Posts Based On Google Trends\n\n## 1)  Daily Schedule Trigger \n\n## 2) Find Trending Topics\n\n## 3) Use OpenAI writes posts for 4 different social platforms\n\n## 4) Log to Google Sheet\n\n## 5) Human in the loop with Telegram for approval\n\n## 6) Post Across Platforms\n\n## 7) Update Google Sheet Log",
+        "height": 600,
+        "width": 1080,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -3856,
+        272
+      ],
+      "id": "e57a5949-d6df-4c28-8c07-62b826977756",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are part of a team that creates world class blog posts. Your job is to choose the topic for each blog post. \n\nThe blog posts are posted on the website of a [FreetimeAI + a company specializing in custom AI automations that handle your busywork, so you can focus on growing your business + offering AI agents, automated workflows, lead generation and enrichment services, and scheduled marketing solutions + targeting SMBs and solopreneurs]. The blog posts are mainly posted as part of an SEO campaign to get [FreetimeAI] to rank high for its products and services.\n\nIn this instance, you are given a list of 2 keywords which have been trending the most on Google news search over the past few days. \n\nYour job is to pick one which you think would make for the most relevant blog post with the best SEO outcomes for the client. \n\nThe keywords have two attributes: \n\n1. query: This attribute determines the search query that users have been searching for which is trending. \n\n2. value: This attribute determines what percentage increase the keyword has seen compared to previous periods (i.e. the increase in search volume). \n\nYou must choose one out of them taking into consideration both the relevance of the keyword for [FreetimeAI]'s SEO efforts and the comparative trendiness determined by the value attribute. \n\nOutput the keyword you decided to post a blog on and nothing else. Don't explain your reasoning. Just output the keyword. \n\nThis instance: \n\nKeyword 1:\n{{ $('2 Most Trending').item.json['most-trending']['#1'].toJsonString() }} \n\nKeyword2: \n{{ $('2 Most Trending').item.json['most-trending']['#2'].toJsonString() }}",
+        "options": {
+          "systemMessage": "You are a helpful assistant"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -2688,
+        -80
+      ],
+      "id": "05f0c7ea-b470-4141-8b0d-2d41902076cc",
+      "name": "AI Agent Pick Most Relevent Keyword"
+    }
+  ],
+  "connections": {
+    "LinkedIn1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "SerpApi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2 Most Trending": {
+      "main": [
+        [
+          {
+            "node": "High search volume keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High search volume keywords": {
+      "main": [
+        [
+          {
+            "node": "AI Agent Pick Most Relevent Keyword",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpApi": {
+      "main": [
+        [
+          {
+            "node": "2 Most Trending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent Pick Most Relevent Keyword",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "SerpApi",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Social Media Writer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Social Media Writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API Facebook",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Instagram get container ID",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LinkedIn1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "X HelloFreetimeAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Social Media Writer": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "X HelloFreetimeAI": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API Facebook": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram get container ID": {
+      "main": [
+        [
+          {
+            "node": "Post to Instagram FreetimeAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Post to Instagram FreetimeAI": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent Pick Most Relevent Keyword": {
+      "main": [
+        [
+          {
+            "node": "AI Social Media Writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
