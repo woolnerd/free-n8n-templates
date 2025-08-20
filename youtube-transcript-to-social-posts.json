@@ -1,0 +1,453 @@
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        -96
+      ],
+      "id": "db93f4d3-d079-4163-a228-b8d42b65570c",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "actorSource": "store",
+        "actorId": {
+          "__rl": true,
+          "value": "CTQcdDtqW5dvELvur",
+          "mode": "list",
+          "cachedResultName": "Youtube Transcript Scraper (topaz_sharingan/Youtube-Transcript-Scraper)",
+          "cachedResultUrl": "https://console.apify.com/actors/CTQcdDtqW5dvELvur/input"
+        },
+        "customBody": "{\"startUrls\": [\"https://www.youtube.com/watch?v=j1UbPAJeEzE\",\"https://youtu.be/yFY3B3LaE7c?si=hoT_OgDQJlSiuGlC\",\"https://www.youtube.com/watch?v=f02j4dEOh2Q\", \"https://youtu.be/lXcx63R9yOc?si=PTHBr41QpKbAZEwD\",\"https://youtu.be/4aIIKXNwPpg?si=lHdqnWaCE73GpycV\",\"https://youtu.be/LfXcngAua_4?si=VBBohqKPHJQa3_Xn\"]}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -96
+      ],
+      "id": "1c5cfa9d-d271-45aa-8654-a6cd1f990e64",
+      "name": "Run an Actor",
+      "credentials": {
+        "apifyApi": {
+          "id": "Jv6T56JEcFeig0XS",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "Datasets",
+        "datasetId": "={{ $json.defaultDatasetId }}"
+      },
+      "type": "@apify/n8n-nodes-apify.apify",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -96
+      ],
+      "id": "075d9082-7874-4c07-b743-8d2d0d858b30",
+      "name": "Get dataset items",
+      "credentials": {
+        "apifyApi": {
+          "id": "Jv6T56JEcFeig0XS",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "92d68fec-65f6-4691-9167-728a74cba969",
+              "name": "transcript",
+              "value": "={{ $json.transcript }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        544,
+        -96
+      ],
+      "id": "24bb0975-09b4-4784-a6f5-cc661970150e",
+      "name": "Edit Fields",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a world-class content strategist for a YouTube creator specializing in classical music. Your primary goal is to repurpose a single video transcript into a complete suite of marketing assets.\n\nCall to Action (CTA) Rules (CRITICAL):\n\nEvery social media post (LinkedIn, Instagram, Twitter, but NOT the blog_post) MUST end with a clear, two-part call to action:\n\nA direct invitation to watch the full video at this link: \"{{ $('Get dataset items').item.json.url }}\"\n\nAn invitation to subscribe to the channel for more content at this channel name: \"@{{ $('Get dataset items').item.json.channelName.split(' ').join('') }}\"\n\nCore Principle: The \"Hook & Tease\"\nFor all social media content (LinkedIn, Instagram, Twitter), you must NOT give away the full story. Instead, follow this model:\n\nHook: Start with a surprising fact or an intriguing question from the video.\n\nTease: Briefly explain the hook, but leave the core answer unresolved.\n\nLure: End with a clear Call to Action that drives traffic back to the full YouTube video.\n\nAuthor's Writing Style (Examples):\n\n<Example 1>: \"A Schenkerian analysis of 'Baby Shark'\n\nA traditional Schenkerian analysis of this song would be more likely to use an interruption symbol // when showing the restarting of the phrase after the dominant. However, the repeat symbols that I've included are NOT commonly used in Schenkerian analysis. I've opted to use repeats in order to serve an analytical purpose: highlighting how repetition is built into the song. Ultimately, when choosing analytical approaches, I think prioritizing communicative clarity should override traditional norms. I've used parenthesized notes to indicate that the main melody does not actually have the notes of the Urlinie. Those notes (scale degrees 3 and 2) are only found in the accompanying harmonies.\"\n\n</Example 1>\n\n<Example 2>: \"If you’re looking for fantastic theory content until my next videos release, I encourage you to check out Dmitri Tymoczko’s Mad Musical Science website https://www.madmusicalscience.com\n\nHis videos are excellent companions to my \"how to transform and develop musical ideas\" series, with a willingness to make things crazier and occasionally go outside of 12-tone equal temperament. It’s all free and amazing.\n\n(This is not a sponsored post. I just think more people should be aware of great stuff like this.)\"\n\n</Example 2>\n\n<Example 3>: \"Music theory will return to Middle Earth for a party on Friday, October 18th at 18:00 EST.\nWill there be scalar mapping to transform a theme? Yes\nWith scales I haven't used on this channel before? Yes\nLyrics I wrote in quenya sung by an amazing soprano? Yes\nSneaking in Middle Earth references and puns in my explanations? They will be like a light to you in dark places.\"\n\n</Example 3>\n\n<Example 4>: \"WELCOME, NEW SUBSCRIBERS!\n\nThe goal of this channel is to show music theory as a creative activity, rather than a set of rules (which theory is too often portrayed as). I post about complex and niche theory topics, as well as film and TV music analysis (with special interest in Middle Earth), plus occasional musical experiments/original compositions/lighthearted fun.\n\nMy priority is on quality over clickbait. I don't want the algorithmic tail wagging the dog of my content. Be sure to check your notifications, since the youTube recommendations system is a fickle overlord. I post when I feel something is worth sharing, averaging around 1 video per month at the moment.\"\n\n</Example 4>\n\nNow, read the following transcript. \n\n<Transcript>:\n{{ $json.transcript }}\n</Transcript>\n\nAdhering to the principles above and the author's voice, generate the following assets:\n\nA LinkedIn Post: A short, thought-provoking post (around 100 words) that presents a surprising fact and asks a question that can only be fully answered by watching the video.\n\nAn Instagram Caption: A very short, personal caption (under 50 words) that hints at a surprising discovery made in the video.\n\nThree Twitter Posts: Three very short, high-intrigue questions or \"Did you know...?\" facts from the video.\n\nA Timestamped Outline: A practical, timestamped summary of the video's main topics for the YouTube description.\n\nThree Short-Form Video Scripts: Three complete, 30-second video scripts for Instagram Reels or YouTube Shorts, based on the most compelling, self-contained tips from the transcript.\n\nAn SEO-Optimized Blog Post: A 700-word article based on the video's core topic, with a clear headline and subheadings, designed to capture search traffic. DO NOT USE THE YOUTUBE LINK AND CHANNEL SUBSCRIPTION HERE.\n\nOutput Format:\nRespond ONLY with a valid JSON object with six keys: linkedin_post, instagram_caption, twitter_posts (an array of strings), timestamped_outline, short_form_scripts (an array of strings), and blog_post.\n\n\n<Style Guide>\nDo not use em-dashes (—) in your response. Instead, you can use standard hyphens for compound modifiers (like in 'high-value'), or rephrase sentences to improve flow without the need for a dash. You can use emojis, but sparingly. Add relevant hashtags. \n</Style Guide>\n\n\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        -96
+      ],
+      "id": "f29001cc-5c9c-49c2-a3be-a234af7bf700",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        672,
+        112
+      ],
+      "id": "8a6d74f3-a0ae-45fe-904e-69ba7b2ee8b7",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"linkedin_article\": \"...\",\n    \"instagram_caption\": \"...\",\n\t\"twitter_posts\": [\"post 1...\", \"post 2...\", \"post 3...\"],\n  \"timestamped_outline\": \"...\",\n  \"short_form_scripts\": [\"script1\",\"script2\", \"script3\"],\n  \"blog_post\": \"...\"\n}",
+        "autoFix": true
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        848,
+        144
+      ],
+      "id": "8418a092-4bc1-41c8-aa46-fc8dd65d56c7",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1c9Wk55uEMSOl1HvhlTsKN_8shXWJwJI0H6PnBdSzPZ8",
+          "mode": "list",
+          "cachedResultName": "Galen Degraf Music Social Media Manager",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c9Wk55uEMSOl1HvhlTsKN_8shXWJwJI0H6PnBdSzPZ8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1c9Wk55uEMSOl1HvhlTsKN_8shXWJwJI0H6PnBdSzPZ8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date ": "={{ $now.format('yyyy-MM-dd hh:mma') }}",
+            "Video Date": "={{ $('Get dataset items').item.json.videoPostDate }}",
+            "Youtube URL": "={{ $('Get dataset items').item.json.url }}",
+            "Video Title": "={{ $('Get dataset items').item.json.videoTitle }}",
+            "Video Views": "={{ $('Get dataset items').item.json.views }}",
+            "Linked In Post": "={{ $json.output.linkedin_article }}",
+            "Instagram Caption": "={{ $json.output.instagram_caption }}",
+            "Twitter Post 1": "={{ $json.output.twitter_posts[0] }}",
+            "Twitter Post 2": "={{ $json.output.twitter_posts[1] }}",
+            "Twitter Post 3": "={{ $json.output.twitter_posts[2] }}",
+            "Timestamped Outline": "={{ $json.output.timestamped_outline }}",
+            "Short Form Script 1": "={{ $json.output.short_form_scripts[0] }}",
+            "Short Form Script 2": "={{ $json.output.short_form_scripts[1] }}",
+            "Short Form Script 3": "={{ $json.output.short_form_scripts[2] }}",
+            "SEO Optimized Blog Post": "={{ $json.output.blog_post }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date ",
+              "displayName": "Date ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video Date",
+              "displayName": "Video Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Youtube URL",
+              "displayName": "Youtube URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video Title",
+              "displayName": "Video Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Video Views",
+              "displayName": "Video Views",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linked In Post",
+              "displayName": "Linked In Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram Caption",
+              "displayName": "Instagram Caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Twitter Post 1",
+              "displayName": "Twitter Post 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Twitter Post 2",
+              "displayName": "Twitter Post 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Twitter Post 3",
+              "displayName": "Twitter Post 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Short Form Script 1",
+              "displayName": "Short Form Script 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Short Form Script 2",
+              "displayName": "Short Form Script 2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Short Form Script 3",
+              "displayName": "Short Form Script 3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "SEO Optimized Blog Post",
+              "displayName": "SEO Optimized Blog Post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamped Outline",
+              "displayName": "Timestamped Outline",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1120,
+        -96
+      ],
+      "id": "2336e3d2-5da1-4fcb-8954-5ec1a358b80a",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "4U2sXIYrTuhj2I8J",
+          "name": "Google Sheets account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        848,
+        304
+      ],
+      "id": "5121ace9-b191-4e4d-bc4c-44afed9d8167",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Run an Actor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run an Actor": {
+      "main": [
+        [
+          {
+            "node": "Get dataset items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get dataset items": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Structured Output Parser",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
