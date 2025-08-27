@@ -1,0 +1,1304 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "events": [
+          "payment_intent.succeeded"
+        ]
+      },
+      "type": "n8n-nodes-base.stripeTrigger",
+      "typeVersion": 1,
+      "position": [
+        -336,
+        -16
+      ],
+      "id": "89521ed9-c8fb-46f0-b3af-44549213bdc2",
+      "name": "Stripe Trigger",
+      "webhookId": "ae50b68d-5272-43aa-87e4-19abed10bfac",
+      "executeOnce": false,
+      "credentials": {
+        "stripeApi": {
+          "id": "gvJQ1C7Lz76eVK7b",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "customer",
+        "customerId": "={{ $json.payment_data.data.object.customer}}"
+      },
+      "type": "n8n-nodes-base.stripe",
+      "typeVersion": 1,
+      "position": [
+        560,
+        208
+      ],
+      "id": "2238d14d-5c23-4856-bbf3-f18456286589",
+      "name": "Get a customer",
+      "executeOnce": false,
+      "credentials": {
+        "stripeApi": {
+          "id": "gvJQ1C7Lz76eVK7b",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "folders",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        336,
+        400
+      ],
+      "id": "a55e8414-d535-4768-b0c5-69e1a9d22bc0",
+      "name": "Split Out",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.name.toSnakeCase() + \"_\" + $('Set Transaction Data').item.json.created_at}}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1wTCK3dxhy4kuMR3hr5WI9RlOU0xKt4GN",
+          "mode": "list",
+          "cachedResultName": "Onboarding_Workflow",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1wTCK3dxhy4kuMR3hr5WI9RlOU0xKt4GN"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -112,
+        400
+      ],
+      "id": "1cd9b556-3d1f-45c6-b77b-bd4e7108a442",
+      "name": "Create Client folder",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I4ClMIGg9UXfsM7f",
+          "name": "Google Drive account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "980830fd-97a2-4562-a49a-c50d705000d8",
+              "name": "=folders",
+              "value": "= [\"01_Contracts\", \"02_Shared_Documents\", \"03_Session_Notes\"]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        112,
+        400
+      ],
+      "id": "58d23f61-e4be-48d1-bdd0-39802b281f52",
+      "name": "Setup Folder Structure",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.folders }}",
+        "driveId": {
+          "__rl": true,
+          "value": "={{ $('Create Client folder').item.json.id }}",
+          "mode": "id"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "root",
+          "cachedResultName": "/ (Root folder)"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        560,
+        400
+      ],
+      "id": "51a26993-313a-495e-9009-866eb2e07268",
+      "name": "Create New Folders",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I4ClMIGg9UXfsM7f",
+          "name": "Google Drive account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6db81f89-efe2-4df6-9272-59cc33940cfe",
+              "name": "start_date",
+              "value": "={{ $now.format('LLL dd, yyyy') }}",
+              "type": "string"
+            },
+            {
+              "id": "a703acfc-3567-4ce4-8af1-31699289e6ee",
+              "name": "end_date",
+              "value": "={{$now.plus(3, 'months').format('LLL dd, yyyy')}}",
+              "type": "string"
+            },
+            {
+              "id": "57da21fe-ed4c-4551-9e7a-13326d03d060",
+              "name": "sessions_count",
+              "value": "5",
+              "type": "string"
+            },
+            {
+              "id": "e36ea8cd-4fe7-40d2-bda1-e93707d37a93",
+              "name": "client_location",
+              "value": "123 Evergreen Lane, Norwalk, CT 06888",
+              "type": "string"
+            },
+            {
+              "id": "6f4f654b-f90e-484a-b90e-962ab820c8e9",
+              "name": "coach_location",
+              "value": "3 Sycamore Tr, Stamford, CT 06988",
+              "type": "string"
+            },
+            {
+              "id": "27a1d0a5-a671-4494-92f7-f61a66f0b5ca",
+              "name": "job_focus",
+              "value": "career guidance, job search strategy, and goal prioritization",
+              "type": "string"
+            },
+            {
+              "id": "7e654f2e-6641-4adf-aec3-0e429b8ef6d1",
+              "name": "session_method",
+              "value": "in-person meetings",
+              "type": "string"
+            },
+            {
+              "id": "4b754ed5-579a-45cf-bea1-768b7482a308",
+              "name": "session_duration",
+              "value": "90 minutes",
+              "type": "string"
+            },
+            {
+              "id": "05bf9319-e114-49d4-954a-9df835867fee",
+              "name": "frequency",
+              "value": "month",
+              "type": "string"
+            },
+            {
+              "id": "d8277f95-a3ae-483f-b961-22c71229ffb4",
+              "name": "total_amount",
+              "value": "$2,500",
+              "type": "string"
+            },
+            {
+              "id": "c78848f3-28b5-4e23-8be2-fe34853befa4",
+              "name": "installment_count",
+              "value": "4",
+              "type": "string"
+            },
+            {
+              "id": "477fa112-27c0-4d3c-903c-5d79b2888f56",
+              "name": "installment_amount",
+              "value": "$625",
+              "type": "string"
+            },
+            {
+              "id": "ecad71a9-d22f-44af-8605-0da37a1110df",
+              "name": "due_date",
+              "value": "the last session of the month",
+              "type": "string"
+            },
+            {
+              "id": "10eb7759-8b3b-4d4b-81b6-8faffdf17d26",
+              "name": "client_email",
+              "value": "={{ $('Get a customer').item.json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "289b6469-4f1e-4866-934b-553efaccf05c",
+              "name": "notice_hours",
+              "value": "48",
+              "type": "string"
+            },
+            {
+              "id": "428dce71-83e1-4880-ae2e-955bc6bfd8b0",
+              "name": "cancellation_fee",
+              "value": "$500",
+              "type": "string"
+            },
+            {
+              "id": "4c2b0f4e-58d3-4511-8801-efa845c84361",
+              "name": "goal1",
+              "value": "Resume review, and improvement",
+              "type": "string"
+            },
+            {
+              "id": "9dcc4f71-defd-46b3-a92f-419b1353e23c",
+              "name": "goal2",
+              "value": "Create target company list",
+              "type": "string"
+            },
+            {
+              "id": "f6913981-994e-4209-90b7-17ceadefbd51",
+              "name": "goal3",
+              "value": "Tap contact network",
+              "type": "string"
+            },
+            {
+              "id": "d53533c9-7e46-4db8-a3c3-f92d185955fb",
+              "name": "drive_folder_link",
+              "value": "=https://drive.google.com/drive/folders/{{ $('Create Client folder').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        608
+      ],
+      "id": "d823fa21-3bc3-4b81-9e2b-7c5921075db7",
+      "name": "Set Contract Fields",
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "=1XbOT-8OELqrzX15WqPWW7nBI0CoBlahwE_Bp_5LxgIA",
+          "mode": "id"
+        },
+        "name": "=Coaching Contract For {{ $('Get a customer').item.json.name }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        112,
+        608
+      ],
+      "id": "8642d4a4-3f8d-49e0-bc07-89f24885f06f",
+      "name": "Copy Contract Template",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I4ClMIGg9UXfsM7f",
+          "name": "Google Drive account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create New Folders').first().json.id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        336,
+        608
+      ],
+      "id": "a4a16439-b10e-40af-b7b9-dc228e7170d1",
+      "name": "Move Contract To Client Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I4ClMIGg9UXfsM7f",
+          "name": "Google Drive account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "replaceAll",
+              "text": "<START_DATE>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.start_date }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<END_DATE>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.end_date }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<SESSIONS_COUNT>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.sessions_count }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<CLIENT_LOCATION>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.client_location }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<COACH_LOCATION>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.coach_location}}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<CLIENT>",
+              "replaceText": "={{ $('Get a customer').item.json.name }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<COACH>",
+              "replaceText": "David Woolner"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<JOB_FOCUS>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.job_focus }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<SESSION_METHOD>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.session_method }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<SESSION_DURATION>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.session_duration }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<FREQUENCY>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.frequency }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<TOTAL_AMOUNT>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.total_amount }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<INSTALLMENT_COUNT>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.installment_count }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<INSTALLMENT_AMOUNT>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.installment_amount }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<DUE_DATE>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.due_date }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<CLIENT_EMAIL>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.client_email }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<NOTICE_HOURS>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.notice_hours }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<CANCELLATION_FEE>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.cancellation_fee }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<GOAL1>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.goal1 }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<GOAL2>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.goal2 }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<GOAL3>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.goal3 }}"
+            },
+            {
+              "action": "replaceAll",
+              "text": "<DRIVE_FOLDER_LINK>",
+              "replaceText": "={{ $('Set Contract Fields').item.json.drive_folder_link }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        560,
+        608
+      ],
+      "id": "47be2b4c-3be1-455c-ad26-2fdc88094742",
+      "name": "Replace Contract Text With Client Details",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "TKyeIxWuLipktAAq",
+          "name": "Google Docs account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "share",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ $('Create Client folder').item.json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "user",
+            "emailAddress": "={{ $('Get a customer').item.json.email }}"
+          }
+        },
+        "options": {
+          "sendNotificationEmail": false
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        784,
+        608
+      ],
+      "id": "dc0ce0d9-a65b-47fa-9212-93c6401d29a6",
+      "name": "Update Folder Permissions",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "I4ClMIGg9UXfsM7f",
+          "name": "Google Drive account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get a customer').item.json.email }}",
+        "subject": "=Welcome Aboard {{ $('Get a customer').item.json.name.split(' ')[0]}}!",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n    <title>Welcome Aboard!</title>\n    <style>\n        /* Basic Reset */\n        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }\n        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }\n        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }\n        table { border-collapse: collapse !important; }\n        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #f4f4f4; }\n        a[x-apple-data-detectors] {\n            color: inherit !important;\n            text-decoration: none !important;\n            font-size: inherit !important;\n            font-family: inherit !important;\n            font-weight: inherit !important;\n            line-height: inherit !important;\n        }\n        /* Responsive Styles */\n        @media screen and (max-width: 600px) {\n            .content-table {\n                width: 100% !important;\n            }\n        }\n    </style>\n</head>\n<body style=\"margin: 0 !important; padding: 0 !important; background-color: #f4f4f4;\">\n    <!-- Main Table -->\n    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n        <tr>\n            <td align=\"center\" style=\"padding: 20px 0;\">\n                <!-- Content Table -->\n                <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" class=\"content-table\" style=\"background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">\n                    <!-- Header -->\n                    <tr>\n                        <td align=\"center\" style=\"padding: 40px 20px 20px 20px;\">\n                            <h1 style=\"font-family: Arial, sans-serif; font-size: 28px; font-weight: bold; color: #333333; margin: 0;\">Welcome to the Next Step in Your Career!</h1>\n                        </td>\n                    </tr>\n                    <!-- Body Content -->\n                    <tr>\n                        <td align=\"left\" style=\"padding: 0 30px 20px 30px; font-family: Arial, sans-serif; font-size: 16px; line-height: 24px; color: #555555;\">\n                            <p style=\"margin: 0 0 20px 0;\">Hi {{ $('Get a customer').item.json.name.split(' ')[0]}},</p>\n                            <p style=\"margin: 0 0 20px 0;\">I am absolutely thrilled to have you on board and excited to partner with you on this journey. Taking this step is a significant investment in yourself, and my goal is to make it as rewarding as possible.</p>\n                            <p style=\"margin: 0 0 20px 0;\">To get started, there are just two simple steps to complete:</p>\n                        </td>\n                    </tr>\n                    <!-- Step 1: Calendly Button -->\n                    <tr>\n                        <td align=\"left\" style=\"padding: 10px 30px;\">\n                            <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">\n                                <tr>\n                                    <td align=\"left\" style=\"font-family: Arial, sans-serif; font-size: 16px; line-height: 24px; color: #555555;\">\n                                        <strong style=\"color: #333333;\">Step 1: Book Your Kick-Off Session</strong>\n                                        <p style=\"margin: 5px 0 15px 0;\">This is our foundational 30-minute call where we'll map out our goals. Please choose a time that works best for you.</p>\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <td align=\"center\">\n                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                                            <tr>\n                                                <td align=\"center\" style=\"border-radius: 6px;\" bgcolor=\"#2563eb\">\n                                                    <a href=\"https://calendly.com/hello-nexloop/30min\" target=\"_blank\" style=\"font-size: 16px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 6px; padding: 14px 28px; border: 1px solid #2563eb; display: inline-block; font-weight: bold;\">Book Your Session</a>\n                                                </td>\n                                            </tr>\n                                        </table>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                    <!-- Step 2: Google Drive Button -->\n                    <tr>\n                        <td align=\"left\" style=\"padding: 30px 30px 20px 30px;\">\n                            <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">\n                                <tr>\n                                    <td align=\"left\" style=\"font-family: Arial, sans-serif; font-size: 16px; line-height: 24px; color: #555555;\">\n                                        <strong style=\"color: #333333;\">Step 2: Access Your Shared Client Folder</strong>\n                                        <p style=\"margin: 5px 0 15px 0;\">I've created a secure, private folder for us on Google Drive. We'll use this to share documents, session notes, and other resources throughout our time together.</p>\n                                    </td>\n                                </tr>\n                                <tr>\n                                    <td align=\"center\">\n                                        <table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n                                            <tr>\n                                                <td align=\"center\" style=\"border-radius: 6px;\" bgcolor=\"#10b981\">\n                                                    <a href=\"https://drive.google.com/drive/folders/1eWkenE1qtLAE6TMKhtE0t6c-2VQpmQ3N\" target=\"_blank\" style=\"font-size: 16px; font-family: Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 6px; padding: 14px 28px; border: 1px solid #10b981; display: inline-block; font-weight: bold;\">Open Your Folder</a>\n                                                </td>\n                                            </tr>\n                                        </table>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                    <!-- Closing -->\n                    <tr>\n                        <td align=\"left\" style=\"padding: 30px 30px 40px 30px; font-family: Arial, sans-serif; font-size: 16px; line-height: 24px; color: #555555;\">\n                            <p style=\"margin: 0;\">Once you've booked your session, I'll send a calendar invitation with all the details. If you have any questions at all, please don't hesitate to reply to this email.</p>\n                            <p style=\"margin: 20px 0 0 0;\">Looking forward to our first session!</p>\n                            <p style=\"margin: 20px 0 0 0;\">Best regards,<br>Sarah<br>Your Career Coach</p>\n                        </td>\n                    </tr>\n                     <!-- Footer -->\n                    <tr>\n                        <td align=\"center\" style=\"padding: 20px 30px; font-family: Arial, sans-serif; font-size: 12px; line-height: 18px; color: #999999; border-top: 1px solid #eeeeee;\">\n                            <p style=\"margin: 0;\">You received this email because you signed up for a coaching package.</p>\n                            <p style=\"margin: 5px 0 0 0;\">Career Coach Business Name | 123 Main St, Anytown, USA</p>\n                        </td>\n                    </tr>\n                </table>\n                <!-- /Content Table -->\n            </td>\n        </tr>\n    </table>\n    <!-- /Main Table -->\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -112,
+        816
+      ],
+      "id": "6d76ad2c-55f4-425e-8eac-f508cff8cb5b",
+      "name": "Send Welcome Message to Client",
+      "webhookId": "7166b464-9370-4d97-80b1-530c7cf81c51",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "SBCKHYvUjIXiJVN8",
+          "name": "Gmail Personal davidwoolner@gmail.com "
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1aJ_FrJirmtJenGR5B0fPHZpLwR3FeyBVRnvwWVgCGa4",
+          "mode": "list",
+          "cachedResultName": "Primary Coach Client List",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aJ_FrJirmtJenGR5B0fPHZpLwR3FeyBVRnvwWVgCGa4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1aJ_FrJirmtJenGR5B0fPHZpLwR3FeyBVRnvwWVgCGa4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Project_Type": "={{ $('Set Transaction Data').item.json.payment_data.data.object.description }}",
+            "Client_Email": "={{ $('Set Contract Fields').item.json.client_email }}",
+            "Project_Value": "={{ $('Set Transaction Data').item.json.payment_data.data.object.amount / 100 }}",
+            "Status": "Onboarding",
+            "Start_Date": "={{ $('Set Contract Fields').item.json.start_date }}",
+            "Client_Name": "={{ $('Get a customer').item.json.name }}",
+            "GDrive_Link": "={{ $('Set Contract Fields').item.json.drive_folder_link }}",
+            "Contract_Status": "Sent",
+            "Client_Id": "={{ $('Get a customer').item.json.id }}"
+          },
+          "matchingColumns": [
+            "Client_Id"
+          ],
+          "schema": [
+            {
+              "id": "Client_Id",
+              "displayName": "Client_Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Client_Name",
+              "displayName": "Client_Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Client_Email",
+              "displayName": "Client_Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Project_Type",
+              "displayName": "Project_Type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Start_Date",
+              "displayName": "Start_Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Project_Value",
+              "displayName": "Project_Value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GDrive_Link",
+              "displayName": "GDrive_Link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contract_Status",
+              "displayName": "Contract_Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        112,
+        816
+      ],
+      "id": "84a0f0ae-0557-4130-9ed7-7a22c73e208b",
+      "name": "Add Client to Database",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workspace": "1210470158625009",
+        "name": "=Onboard: {{ $json.Client_Name }}",
+        "otherProperties": {
+          "assignee": "1210470158624997",
+          "notes": "=Client Name: {{ $json.Client_Name }}\n\nClient Email: {{ $json.Client_Email }}\n\nProject Type: {{ $json.Project_Type }}\n\nProject Value: ${{ $json.Project_Value }}\n\nStart Date: {{ $now.toFormat('DDDD') }}\n\nGoogle Drive Link: {{ $json.GDrive_Link }}\n",
+          "projects": [
+            "1211156645083939"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        336,
+        816
+      ],
+      "id": "b691a171-ff3f-4188-a37f-a5ad99f9f24c",
+      "name": "Create a Onboard Task",
+      "credentials": {
+        "asanaApi": {
+          "id": "oT9C122CRjswtDM0",
+          "name": "Asana account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "move",
+        "id": "={{ $json.gid }}",
+        "projectId": "1211156645083939",
+        "section": "1211156645083942"
+      },
+      "type": "n8n-nodes-base.asana",
+      "typeVersion": 1,
+      "position": [
+        560,
+        816
+      ],
+      "id": "c328dbb1-f6c6-45c0-80ba-dcc7e42c9c8c",
+      "name": "Move Task to Onboarding Column",
+      "credentials": {
+        "asanaApi": {
+          "id": "oT9C122CRjswtDM0",
+          "name": "Asana account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08VB3NE8RE",
+          "mode": "list",
+          "cachedResultName": "davidwoolner"
+        },
+        "text": "=🎉 *New Client Onboarded!* 🎉\n\n*Name:* {{ $('Add Client to Database').item.json.Client_Name }}\n\n*Package:* {{ $('Add Client to Database').item.json.Project_Type }}\n\n*Contract Status:* {{ $('Add Client to Database').item.json.Contract_Status }}\n\n*Start Date:* {{ $('Add Client to Database').item.json.Start_Date }}\n\nThe onboarding sequence is complete and their task has been created in Asana.\n\nGoogle Drive Link: {{ $('Add Client to Database').item.json.GDrive_Link }}\n\nAsana Link: {{ $('Create a Onboard Task').item.json.permalink_url }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false,
+          "mrkdwn": true,
+          "unfurl_links": true
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        784,
+        816
+      ],
+      "id": "e6d15ec7-bd62-47e3-961c-8c0319f77f7f",
+      "name": "Send Success Message",
+      "webhookId": "fcb5fb4c-0f18-405d-aeae-1898c05f81fe",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "elsYAmN5ggBCHJcn",
+          "name": "Slack Users Write"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## System: Automated Client Onboarding (Idempotent)\n\n### Objective: This system uses a two-workflow \"Logger & Processor\" pattern to completely and reliably automate the client onboarding process. This architecture is specifically designed to be idempotent, preventing duplicate runs caused by webhook race conditions.\n\n## Workflow 1: Webhook Logger (Runs in Real-time)\nPurpose: This workflow's only job is to be extremely fast. It instantly catches every incoming webhook from Stripe and logs it to a Google Sheet without any processing.\n\n### 1. Stripe Trigger:\n\nEvent: payment_intent.succeeded\n\nAction: Catches the webhook from Stripe the moment a payment is confirmed.\n\n### 2. Log Transaction Attempt (Google Sheet):\n\nAction: Immediately appends a new row to the \"Stripe Webhook Log\" sheet.\n\nData Saved:\n\n- idempotency_key: The unique ID for the Stripe event.\n\n- timestamp: The exact time the webhook was received.\n\n- status: A static value of \"NEW\".\n\n- payload: The entire JSON payload from Stripe, converted to a string.\n\n## Workflow 2: Onboarding Processor (Runs on a Schedule)\nPurpose: This workflow runs every 2 minutes. It calmly reviews all the \"NEW\" events logged by Workflow 1, deduplicates them to find the true, unique transactions, and then executes the full onboarding process for each one.\n\n### Phase 1: Fetch & Deduplicate New Events\n1. Schedule Trigger:\n\nSchedule: Every 2 minutes.\n\nAction: Kicks off the processor workflow.\n\n2. Find All Attempts (Google Sheet):\n\nAction: Gets all rows from the \"Stripe Webhook Log\" where the status is \"NEW\".\n\n3. Deduplicate Transactions (Code):\n\nAction: This is the core of the idempotency logic. It looks at all the \"NEW\" rows and, for each unique idempotency_key, it finds the one with the earliest timestamp. Only these \"winning\" unique events are passed on to the next step.\n\n### Phase 2: Data Preparation\n4. Set Transaction Data:\n\nAction: Parses the payload string from the winning event back into a usable JSON object. It then extracts key information like customer_id, amount, and description into clean fields for easy use later in the workflow.\n\n5. Get a Customer (Stripe):\n\nAction: Uses the customer_id to fetch the client's full details from Stripe, including their name and email address.\n\n### Phase 3: Client Asset Creation (Google Drive)\n6. Create Client Folder & Sub-folders:\n\nAction: Creates a new, dynamically named parent folder for the client (e.g., john_smith_2025-08-26) and populates it with the standard sub-folder structure (01_Contracts, etc.).\n\n### Phase 4: Contract Generation & Delivery\n7. Set Contract Fields, Copy, Move & Replace:\n\nAction: A sequence that prepares all dynamic data for the contract, copies the master Google Doc template, moves it into the client's folder, and replaces all placeholders (e.g., <CLIENT>) with the correct client and package information.\n\n8. Update Folder Permissions & Send Welcome Email:\n\nAction: Shares the main client folder with the client and sends the final, formatted HTML welcome email containing the Calendly and Google Drive links.\n\n### Phase 5: Internal Housekeeping & Notification\n9. Add Client to Database (Google Sheet):\n\nAction: Appends a new row to the master \"Primary Coach Client List,\" logging all the client's details and setting their initial status to \"Onboarding.\"\n\n10. Create & Move Asana Task:\n\nAction: Creates a new task in the Asana \"Client Pipeline\" project and moves it to the \"Onboarding Queue\" section.\n\n11. Send Success Message (Slack):\n\nAction: Sends a final, formatted notification to a private Slack channel, confirming that the onboarding for a specific client is complete.\n\n### Phase 6: Finalization\n12. Update row in sheet (Google Sheet):\n\nAction: This is the final step. It finds the row for the event we just processed in the \"Stripe Webhook Log\" and updates its status from \"NEW\" to \"PROCESSED\". This prevents it from being picked up on the next run.\n\n",
+        "height": 2400,
+        "width": 624,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1168,
+        -448
+      ],
+      "typeVersion": 1,
+      "id": "2e117399-457d-4ad1-a345-c241ef77f7ca",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ",
+          "mode": "list",
+          "cachedResultName": "Stripe Webhook Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "PaymentInfo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "NEW"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        208
+      ],
+      "id": "6daa8c5d-9eec-40ba-83b4-e53e629d1c0d",
+      "name": "Find All Attempts",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ",
+          "mode": "list",
+          "cachedResultName": "Stripe Webhook Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "PaymentInfo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "timestamp": "={{ $now.toISO() }}",
+            "idempotency_key": "={{ $json.request.idempotency_key }}",
+            "status": "NEW",
+            "payload": "={{ JSON.stringify($json) }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "cc39e15d-e1f1-44b7-b75b-5d8c7873ab8d",
+      "name": "Log Transaction Attempt",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -336,
+        208
+      ],
+      "id": "79b85eb3-9425-4e47-9c69-ee414798c636",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "74bd67ec-495d-470d-8766-97adffdfac93",
+              "name": "payment_data",
+              "value": "={{$json.payload}}",
+              "type": "object"
+            },
+            {
+              "id": "f030d263-8f31-403e-b0de-3120b19f2899",
+              "name": "created_at",
+              "value": "={{ $json.timestamp.toDateTime().format('yyyy-MM-dd') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        208
+      ],
+      "id": "87eac46d-0a2d-4078-900f-19210c5a0a76",
+      "name": "Set Transaction Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $('Find All Attempts').all();\nconst uniqueEvents = {};\n\nfor (const item of items) {\n  const key = item.json.idempotency_key;\n  const timestamp = new Date(item.json.timestamp);\n\n  // If we haven't seen this key before, or if this one is older, it's the new leader.\n  if (!uniqueEvents[key] || timestamp < uniqueEvents[key].timestamp) {\n    uniqueEvents[key] = {\n      timestamp: timestamp,\n      data: item.json // Keep the whole row's data\n    };\n  }\n}\n\n// Convert the object of unique events back into an array for the next node.\nconst output = Object.values(uniqueEvents).map(event => ({ json: event.data }));\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        208
+      ],
+      "id": "1fd2394f-c125-401a-baac-ce8b47110fe8",
+      "name": "Dedupicate Transactions",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ",
+          "mode": "list",
+          "cachedResultName": "Stripe Webhook Log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "PaymentInfo",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Mv8vrEsjgCaBC2eM5Em-FsdwnmZAt2QNPezmSjR13NQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "idempotency_key": "={{ $('Find All Attempts').item.json.idempotency_key }}",
+            "status": "PROCESSED"
+          },
+          "matchingColumns": [
+            "idempotency_key"
+          ],
+          "schema": [
+            {
+              "id": "idempotency_key",
+              "displayName": "idempotency_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "payload",
+              "displayName": "payload",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        992,
+        816
+      ],
+      "id": "c795ed86-50a5-40e2-902f-5d10c0c9180e",
+      "name": "Update Webhook Log Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Stripe Trigger": {
+      "main": [
+        [
+          {
+            "node": "Log Transaction Attempt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a customer": {
+      "main": [
+        [
+          {
+            "node": "Create Client folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Create New Folders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Client folder": {
+      "main": [
+        [
+          {
+            "node": "Setup Folder Structure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Setup Folder Structure": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create New Folders": {
+      "main": [
+        [
+          {
+            "node": "Set Contract Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contract Fields": {
+      "main": [
+        [
+          {
+            "node": "Copy Contract Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Contract Template": {
+      "main": [
+        [
+          {
+            "node": "Move Contract To Client Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Contract To Client Folder": {
+      "main": [
+        [
+          {
+            "node": "Replace Contract Text With Client Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Contract Text With Client Details": {
+      "main": [
+        [
+          {
+            "node": "Update Folder Permissions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Folder Permissions": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Message to Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Welcome Message to Client": {
+      "main": [
+        [
+          {
+            "node": "Add Client to Database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Client to Database": {
+      "main": [
+        [
+          {
+            "node": "Create a Onboard Task",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a Onboard Task": {
+      "main": [
+        [
+          {
+            "node": "Move Task to Onboarding Column",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Task to Onboarding Column": {
+      "main": [
+        [
+          {
+            "node": "Send Success Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Success Message": {
+      "main": [
+        [
+          {
+            "node": "Update Webhook Log Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find All Attempts": {
+      "main": [
+        [
+          {
+            "node": "Dedupicate Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log Transaction Attempt": {
+      "main": [
+        []
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Find All Attempts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Transaction Data": {
+      "main": [
+        [
+          {
+            "node": "Get a customer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Dedupicate Transactions": {
+      "main": [
+        [
+          {
+            "node": "Set Transaction Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
