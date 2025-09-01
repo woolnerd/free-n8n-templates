@@ -1,0 +1,1221 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "7634484349",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $('Edit Fields').item.json.audio_caption }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        704
+      ],
+      "id": "a9bb683c-a3f7-4bcb-a649-b74102a699ee",
+      "name": "Telegram",
+      "webhookId": "f051c2e3-b3c5-4257-b12e-52ccf7b23092",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "039574a4-68d8-4383-8a2f-2db268b7f8a0",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputText": "=subject: {{ $json.subject }}\nemailbody: {{ $json.text}}",
+        "categories": {
+          "categories": [
+            {
+              "category": "Automation Business",
+              "description": "filtering for prospective clients that are interested in automation, AI business, seeking a consultant, seeking a meeting, interested in learning more about how to automate their business or have a question about how I can help them with their business.  "
+            }
+          ]
+        },
+        "options": {
+          "fallback": "discard"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "72b747e3-c8f0-4d02-8c85-38a3b763aed8",
+      "name": "Text Classifier",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5cd4f0f0-5190-4877-b020-7df2d3b9a4cd",
+              "leftValue": "={{ $json.isEmpty() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "276afce8-eab2-4cd1-8ca7-97eb2f4d99c8",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -32,
+        352
+      ],
+      "id": "ef386bea-adcd-4061-8696-3bc5c7c551e4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "21m00Tcm4TlvDq8ikWAM",
+          "mode": "list",
+          "cachedResultName": "Rachel"
+        },
+        "text": "={{ $json.audio_caption }}",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        416,
+        704
+      ],
+      "id": "453818bc-d20a-4f6c-b910-225a50b7fb59",
+      "name": "ElevenLabs3",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "c97sigZ8T1vglZ10",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {
+          "download": false
+        }
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        1056
+      ],
+      "id": "c85fd294-a1b6-4248-b850-48279295437e",
+      "name": "Telegram Trigger2",
+      "webhookId": "919367da-ae6f-4fbb-8561-9d5d9a7aab1b",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "operation": "speechToText",
+        "file": "=data",
+        "additionalOptions": {
+          "languageCode": "en"
+        },
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        416,
+        1056
+      ],
+      "id": "72bc3c26-d90c-4082-aeed-1295e03e6011",
+      "name": "ElevenLabs5",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "c97sigZ8T1vglZ10",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{ $json.message.voice.file_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        192,
+        1056
+      ],
+      "id": "bcc76609-cff9-47d6-b811-9ad2625ae359",
+      "name": "Telegram4",
+      "webhookId": "f25593c9-bec8-40a1-aa7a-719f84cbe77b",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "addLabels",
+        "messageId": "={{ $fromAI('Message_ID', ``, 'string') }}",
+        "labelIds": [
+          "Label_4152467150655571585"
+        ]
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        256,
+        544
+      ],
+      "id": "d45a0721-1c13-4dd6-9798-2424d2479e18",
+      "name": "add_label_gmail_tool",
+      "webhookId": "cd05c019-ac45-48f0-bc8c-52e267c6636c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', ``, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To_Email', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        416,
+        544
+      ],
+      "id": "0bf48323-4165-41e4-83e9-62d2ccf0130e",
+      "name": "Create a draft in Gmail",
+      "webhookId": "0c337720-451f-4aba-8e08-65fb17a31470",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"draft_response\": \"string\",\n   \"draft_id\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        528
+      ],
+      "id": "055831e9-5a42-4232-a833-1abc61693763",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "59f1b696-883c-4c46-80e2-9137faa25f2a",
+              "name": "audio_caption",
+              "value": "=You've received an email determined to be an Urgent Sales Lead. Would you like me to read the email? Read the draft response or just go ahead and send the response?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        704
+      ],
+      "id": "337e72be-ad2a-4d4d-b224-b06daf7edd2f",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $('ElevenLabs5').item.json.text }}",
+        "categories": {
+          "categories": [
+            {
+              "category": "read_the_email"
+            },
+            {
+              "category": "read_the_draft"
+            },
+            {
+              "category": "send_the_email"
+            }
+          ]
+        },
+        "options": {
+          "multiClass": false,
+          "fallback": "other",
+          "systemPromptTemplate": "Please classify the text provided by the user into one of the following categories: read_the_email, read_the_draft, send, and use the provided formatting instructions below. Don't explain, and only output the json."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.textClassifier",
+      "typeVersion": 1.1,
+      "position": [
+        -32,
+        1248
+      ],
+      "id": "0323a69d-6587-4039-b6d1-a35b70838423",
+      "name": "Text Classifier1",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8",
+          "mode": "list",
+          "cachedResultName": "Sales Leads From Gmail",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "received",
+            "draft_response_id": "={{ $json.output.draft_id }}",
+            "message_id": "={{ $('Gmail Trigger').item.json.id }}"
+          },
+          "matchingColumns": [
+            "message_id"
+          ],
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_response_id",
+              "displayName": "draft_response_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -32,
+        704
+      ],
+      "id": "891f53f0-dec9-481b-affa-415237ca6ec5",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8",
+          "mode": "list",
+          "cachedResultName": "Sales Leads From Gmail",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "received"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        1056
+      ],
+      "id": "7a090a59-3382-42d9-804d-8ede135fa143",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "messageId": "={{ $json.message_id }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        1264
+      ],
+      "id": "1a7596bf-cf23-4553-8599-92aa0a2cf5f6",
+      "name": "Get a message",
+      "webhookId": "d10fdeee-7421-4804-8664-bdb5d10fbc21",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "7634484349",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $('Get a message').item.json.snippet }}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        1264
+      ],
+      "id": "e8d3c3f9-96da-4186-97e4-10eeb5fa4ab1",
+      "name": "Telegram1",
+      "webhookId": "f051c2e3-b3c5-4257-b12e-52ccf7b23092",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "21m00Tcm4TlvDq8ikWAM",
+          "mode": "list",
+          "cachedResultName": "Rachel"
+        },
+        "text": "={{ $json.snippet}}",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        624,
+        1264
+      ],
+      "id": "cd170bab-4f18-40fc-b993-ff346066e2a0",
+      "name": "ElevenLabs",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "c97sigZ8T1vglZ10",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "7634484349",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "={{ $('Get a draft').item.json.subject}}\n\nMessage: {{ $('Get a draft').item.json.text}}"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        1456
+      ],
+      "id": "4f1ccb41-1df4-44c7-8eae-bea6dce20f46",
+      "name": "Telegram2",
+      "webhookId": "f051c2e3-b3c5-4257-b12e-52ccf7b23092",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "21m00Tcm4TlvDq8ikWAM",
+          "mode": "list",
+          "cachedResultName": "Rachel"
+        },
+        "text": "={{ $json.headers.subject }}\n\nMessage: {{ $json.text}}",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        624,
+        1456
+      ],
+      "id": "0e60282a-6e4c-4963-865b-a7b7be92b78e",
+      "name": "ElevenLabs1",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "c97sigZ8T1vglZ10",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "7634484349",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "=Message sent, good luck!"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        848,
+        1680
+      ],
+      "id": "1826b2a8-3975-4699-8274-0fdf18c486f9",
+      "name": "Telegram3",
+      "webhookId": "f051c2e3-b3c5-4257-b12e-52ccf7b23092",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "21m00Tcm4TlvDq8ikWAM",
+          "mode": "list",
+          "cachedResultName": "Rachel"
+        },
+        "text": "=Message sent, good luck!",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        624,
+        1680
+      ],
+      "id": "d6d31167-c0ba-4e24-86a6-3558e6d10210",
+      "name": "ElevenLabs4",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "c97sigZ8T1vglZ10",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "operation": "get",
+        "messageId": "={{ $('Get row(s) in sheet').item.json.draft_response_id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        1456
+      ],
+      "id": "403d9d45-60b0-4fe3-90eb-13e4b2cd8ee6",
+      "name": "Get a draft",
+      "webhookId": "d10fdeee-7421-4804-8664-bdb5d10fbc21",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://gmail.googleapis.com/gmail/v1/users/me/drafts/send",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "gmailOAuth2",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $('Get row(s) in sheet').item.json.draft_response_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        400,
+        1680
+      ],
+      "id": "f0907381-a347-4203-b078-e683074643f6",
+      "name": "HTTP Request",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAudio",
+        "chatId": "7634484349",
+        "binaryData": true,
+        "additionalFields": {
+          "caption": "=Sorry, I didn't get that - please repeat!"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        624,
+        1904
+      ],
+      "id": "be784fe0-8c2f-4364-84fa-e1e18f1a50c7",
+      "name": "Telegram5",
+      "webhookId": "f051c2e3-b3c5-4257-b12e-52ccf7b23092",
+      "credentials": {
+        "telegramApi": {
+          "id": "XfHFIE8lmX9sjV8e",
+          "name": "Telegram account DaveBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "21m00Tcm4TlvDq8ikWAM",
+          "mode": "list",
+          "cachedResultName": "Rachel"
+        },
+        "text": "=Sorry, I didn't get that - please repeat!",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        400,
+        1904
+      ],
+      "id": "a2ce0e1e-14e3-4477-b810-f20c64eabf92",
+      "name": "ElevenLabs6",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "c97sigZ8T1vglZ10",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8",
+          "mode": "list",
+          "cachedResultName": "Sales Leads From Gmail",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gS9kpJgAV-ZNyMIjQ9CXnsrK9zEGCXJWY9NHItIxPx8/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message_id": "={{ $('Get row(s) in sheet').item.json.message_id }}",
+            "status": "sent"
+          },
+          "matchingColumns": [
+            "message_id"
+          ],
+          "schema": [
+            {
+              "id": "message_id",
+              "displayName": "message_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "draft_response_id",
+              "displayName": "draft_response_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1072,
+        1680
+      ],
+      "id": "ff35d174-1b4d-412d-9956-a23484074345",
+      "name": "Append or update row in sheet1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert AI assistant responsible for processing and responding to urgent sales emails. Your sole purpose is to triage these incoming emails by labeling them and drafting a standardized initial response. You must operate using only the tools provided.\n\nContext:\nYou will be activated when a new email, flagged as an urgent sales inquiry, is received. You will have access to the following information from the incoming email:\n\nEmail ID: {{ $('Gmail Trigger').item.json.id }}\n\nSender's Address: {{ $('Gmail Trigger').item.json.from.value[0][\"address\"] }}\n\nEmail Body & Subject: The full content of the email.\n\nAvailable Tools:\n\nadd_label_gmail_tool(id: string): Applies the \"Urgent-Sales-Lead\" label to an email using its unique ID.\n\ndraft_response_tool(recipient_email: string, body: string): Creates a draft email in Gmail. It returns the unique ID of the created draft.\n\nMandatory Workflow:\nYou must follow these steps in this exact order:\n\nLabel the Email: Immediately call the add_label_gmail_tool using the ID from the trigger data: {{ $('Gmail Trigger').item.json.id }}.\n\nDraft the Response: After the email is labeled, call the draft_response_tool.\n\nThe recipient_email parameter MUST be the sender's address from the trigger data: {{ $('Gmail Trigger').item.json.from.value[0][\"address\"] }}.\n\nThe body of the email should be a polite, professional acknowledgment. Use the following template:\n\"Hello,\n\nThank you for your inquiry. We have received your message and can confirm it has been marked as a priority.\n\nOur sales team is reviewing your request and will get back to you as soon as possible.\n\nBest regards,\nThe Sales Team\"\n\nFinal Output:\nYour final output after executing both tools must be a JSON object containing the response you drafted and the ID of that draft. The draft_id will begin with 'r-'. The structure must be:\n\n{\n\"draft_response\": \"The full text of the email response you drafted.\",\n\"draft_id\": \"The unique ID returned by the draft_response_tool. It can be found under the response object as the first item and id it starts with 'r-'\"\n}\n\nDo not add any other text or explanation to your final output.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        320
+      ],
+      "id": "68a2ea9e-d545-4bee-be1b-6d883fd55229",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        112,
+        528
+      ],
+      "id": "61a65a75-df0f-4cba-8c53-16bb5075c880",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        1488
+      ],
+      "id": "fee39637-1e90-40c6-b1ec-4d895fcbf766",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        160,
+        144
+      ],
+      "id": "a194356d-01cc-4b54-98d3-92071f773c09",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Eua8pv4g3NZyG4tR",
+          "name": "OpenRouter account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram": {
+      "main": [
+        []
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs3": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Telegram4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs5": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram4": {
+      "main": [
+        [
+          {
+            "node": "ElevenLabs5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "add_label_gmail_tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "ElevenLabs3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Classifier1": {
+      "main": [
+        [
+          {
+            "node": "Get a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a draft",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "ElevenLabs6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a message": {
+      "main": [
+        [
+          {
+            "node": "ElevenLabs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs1": {
+      "main": [
+        [
+          {
+            "node": "Telegram2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram3": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs4": {
+      "main": [
+        [
+          {
+            "node": "Telegram3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a draft": {
+      "main": [
+        [
+          {
+            "node": "ElevenLabs1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "ElevenLabs4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ElevenLabs6": {
+      "main": [
+        [
+          {
+            "node": "Telegram5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Text Classifier",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
