@@ -1,0 +1,1944 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.explorium.ai/v1/prospects/match",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"prospects_to_match\": [ {\n      \"full_name\": \"{{ $('Google Sheets Trigger').item.json['First Name'] }} {{ $('Google Sheets Trigger').item.json['Last Name'] }}\",\n      \"company_name\": \"{{ $('Google Sheets Trigger').item.json.Company }}\",\n      \"email\": \"{{ $('Google Sheets Trigger').item.json['Business Email'] }}\"\n    } ]\n}",
+        "options": {}
+      },
+      "id": "34285483-feda-4b95-8074-9711ae2d09a7",
+      "name": "Match_prospect",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        -400,
+        672
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CvXm1ZCL38A6AmbL",
+          "name": "Header Auth Exploriuam API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.explorium.ai/v1/prospects/profiles/enrich",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"prospect_id\": \"{{ $json.matched_prospects[0].prospect_id }}\"\n} ",
+        "options": {}
+      },
+      "id": "c6e3ab2e-8df6-49b9-8b63-cc97a66c4fef",
+      "name": "Enrich_Prospect",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        96,
+        656
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CvXm1ZCL38A6AmbL",
+          "name": "Header Auth Exploriuam API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "{{ $('Find Lead Segment').item.json.leadSegment }}",
+                    "rightValue": "SMB",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "2b1c169d-4508-4873-9250-09b4730d0963"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "SMB"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e981fce2-e05b-45ab-bf89-cbe458ec3ee6",
+                    "leftValue": "={{ $('Find Lead Segment').item.json.leadSegment }}",
+                    "rightValue": "Midmarket",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Midmarket"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2bbe8844-8450-463f-a514-6cba473bca06",
+                    "leftValue": "={{ $('Find Lead Segment').item.json.leadSegment }}",
+                    "rightValue": "Enterprise",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Enterprise"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": 0
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        2256,
+        640
+      ],
+      "id": "efc3511b-a981-475e-92fb-059b0b9ba0cd",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.explorium.ai/v1/businesses/match",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"businesses_to_match\": [\n    {\n      \"name\": \"{{ $('Google Sheets Trigger').item.json.Company }}\",\n      \"website\": \"{{ $('Google Sheets Trigger').item.json['Company Website'] }}\"\n}\n  ]\n}",
+        "options": {}
+      },
+      "id": "432c6f37-596b-48f9-8cad-11c596cbc498",
+      "name": "Match_business",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        544,
+        656
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CvXm1ZCL38A6AmbL",
+          "name": "Header Auth Exploriuam API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.explorium.ai/v1/businesses/firmographics/enrich",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"business_id\": \"{{ $json.matched_businesses[0].business_id }}\"\n} ",
+        "options": {}
+      },
+      "id": "bf2dc906-29d1-4977-92a1-6f70b3e72a2e",
+      "name": "Enrich_Business",
+      "type": "n8n-nodes-base.httpRequest",
+      "position": [
+        992,
+        656
+      ],
+      "typeVersion": 4.2,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "CvXm1ZCL38A6AmbL",
+          "name": "Header Auth Exploriuam API account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Google Sheet Listens for Google Form Leads\n\n- Create a unique Id\n- Add Unique Id to new lead\n",
+        "height": 156,
+        "width": 832,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1344,
+        480
+      ],
+      "id": "b6ac5e30-6394-4d46-8354-a81bf9539489",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Enrich Lead with Exploria API\n\n* LinkedIn Profile Details\n* Company Size \n* Job Title, etc.",
+        "height": 172,
+        "width": 1720,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -368,
+        448
+      ],
+      "id": "4bc6fb16-86b7-4c4d-9432-45c6b7493295",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Segment based on Company Size and send Gmail message to our appropriate sales team",
+        "height": 164,
+        "width": 1244,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        448
+      ],
+      "id": "2dce94ad-d918-47d8-b533-54ab7ea945d1",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 5,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg",
+          "mode": "list",
+          "cachedResultName": "Lead Enrichment Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713633770,
+          "mode": "list",
+          "cachedResultName": "Form Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit#gid=1713633770"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1296,
+        672
+      ],
+      "id": "007f6d7d-79bd-49bc-b4ea-b68bdcbed129",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "Mqn0k4SLdLYDoxDq",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "dave@getfreetime.ai",
+        "subject": " 🚀 New SMB Lead! 🚀 ",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>New SMB Lead</title>\n</head>\n<body style=\"margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;\">\n    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n        <tr>\n            <td style=\"padding: 20px 0;\">\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"border-collapse: collapse; background-color: #ffffff; border: 1px solid #cccccc;\">\n                    <!-- Header -->\n                    <tr>\n                        <td align=\"center\" style=\"padding: 20px 0 20px 0; background-color: #007bff; color: #ffffff;\">\n                            <h1 style=\"margin: 0; font-size: 24px;\">🚀 New SMB Lead! 🚀</h1>\n                        </td>\n                    </tr>\n                    <!-- Content -->\n                    <tr>\n                        <td style=\"padding: 30px 20px;\">\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse: collapse;\">\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555; width: 150px;\"><strong>Name:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $('Clean Up for Email').item.json.full_name }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Job Title:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $('Clean Up for Email').item.json.company_role }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Company Size:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $('Clean Up for Email').item.json.company_size }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555; vertical-align: top;\"><strong>Primary Goal:</strong></td>\n                                    <td style=\"padding: 10px 0;\">\"{{ $('Clean Up for Email').item.json.primary_goal }}\"</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>LinkedIn:</strong></td>\n                                    <td style=\"padding: 10px 0;\"><a href=\"{{ $('Clean Up for Email').item.json.linkedin_url }}\" style=\"color: #007bff;\">View Profile</a></td>\n                                </tr>\n                                <tr>\n                                    <!-- ** IMPORTANT: Replace YOUR_SHEET_ID and YOUR_SHEET_GID with your actual Google Sheet values ** -->\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Lead Record:</strong></td>\n                                    <td style=\"padding: 10px 0;\"><a href=\"{{ $('Clean Up for Email').item.json.lead_record }}\" style=\"color: #007bff;\">View in Google Sheets</a></td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                    <!-- Action Box -->\n                    <tr>\n                        <td style=\"padding: 0 20px 30px 20px;\">\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse: collapse; background-color: #e9f5ff; border-left: 4px solid #007bff;\">\n                                <tr>\n                                    <td style=\"padding: 20px;\">\n                                        <h3 style=\"margin-top: 0; color: #0056b3;\">Sales Approach</h3>\n                                        <p style=\"margin-bottom: 0; color: #333333;\">This SMB lead is looking to streamline operations. They value speed and efficiency. In your outreach, focus on quick wins and how you can save them time immediately.</p>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n</body>\n</html>\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2592,
+        624
+      ],
+      "id": "1e62edcb-f1dd-49b4-990b-e65c99eb8c8e",
+      "name": "Send a message",
+      "webhookId": "84544455-3eb1-4646-9bf8-23278beef9f5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "dave@getfreetime.ai",
+        "subject": "📈 New Mid-Market Lead! 📈",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>New Mid-Market Lead</title>\n</head>\n<body style=\"margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;\">\n    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n        <tr>\n            <td style=\"padding: 20px 0;\">\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"border-collapse: collapse; background-color: #ffffff; border: 1px solid #cccccc;\">\n                    <!-- Header -->\n                    <tr>\n                        <td align=\"center\" style=\"padding: 20px 0 20px 0; background-color: #ffc107; color: #333333;\">\n                            <h1 style=\"margin: 0; font-size: 24px;\">📈 New Mid-Market Lead! 📈</h1>\n                        </td>\n                    </tr>\n                    <!-- Content -->\n                    <tr>\n                        <td style=\"padding: 30px 20px;\">\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse: collapse;\">\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555; width: 150px;\"><strong>Name:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $json.full_name }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Job Title:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $json.company_role }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Company Size:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $json.company_size }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555; vertical-align: top;\"><strong>Primary Goal:</strong></td>\n                                    <td style=\"padding: 10px 0;\">\"{{ $json.primary_goal }}\"</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>LinkedIn:</strong></td>\n                                    <td style=\"padding: 10px 0;\"><a href=\"{{ $json.linkedin_url }}\" style=\"color: #007bff;\">View Profile</a></td>\n                                </tr>\n                                <tr>\n                                    <!-- ** IMPORTANT: Replace YOUR_SHEET_ID and YOUR_SHEET_GID with your actual Google Sheet values ** -->\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Lead Record:</strong></td>\n                                    <td style=\"padding: 10px 0;\"><a href=\"{{ $json.lead_record }}\" style=\"color: #007bff;\">View in Google Sheets</a></td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                    <!-- Action Box -->\n                    <tr>\n                        <td style=\"padding: 0 20px 30px 20px;\">\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse: collapse; background-color: #fff8e1; border-left: 4px solid #ffc107;\">\n                                <tr>\n                                    <td style=\"padding: 20px;\">\n                                        <h3 style=\"margin-top: 0; color: #856404;\">Sales Approach</h3>\n                                        <p style=\"margin-bottom: 0; color: #333333;\">This Mid-Market lead is likely focused on scalable growth and improving team efficiency. They will be interested in clear ROI and how your solutions can integrate with their existing processes. In your outreach, prepare to discuss how automation can support a growing team and drive measurable business results.</p>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2592,
+        800
+      ],
+      "id": "3291a22f-a7a7-410e-885a-57c7caba4994",
+      "name": "Send a message1",
+      "webhookId": "84544455-3eb1-4646-9bf8-23278beef9f5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "dave@getfreetime.ai",
+        "subject": "📊 New Enterprise Lead! 📊",
+        "message": "=<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <title>New Enterprise Lead</title>\n</head>\n<body style=\"margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif;\">\n    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n        <tr>\n            <td style=\"padding: 20px 0;\">\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"600\" style=\"border-collapse: collapse; background-color: #ffffff; border: 1px solid #cccccc;\">\n                    <!-- Header -->\n                    <tr>\n                        <td align=\"center\" style=\"padding: 20px 0 20px 0; background-color: #28a745; color: #ffffff;\">\n                            <h1 style=\"margin: 0; font-size: 24px;\">📊 New Enterprise Lead! 📊</h1>\n                        </td>\n                    </tr>\n                    <!-- Content -->\n                    <tr>\n                        <td style=\"padding: 30px 20px;\">\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse: collapse;\">\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555; width: 150px;\"><strong>Name:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $('Clean Up for Email').item.json.full_name }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Job Title:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $('Clean Up for Email').item.json.company_role }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Company Size:</strong></td>\n                                    <td style=\"padding: 10px 0;\">{{ $('Clean Up for Email').item.json.company_size }}</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555; vertical-align: top;\"><strong>Primary Goal:</strong></td>\n                                    <td style=\"padding: 10px 0;\">\"{{ $('Clean Up for Email').item.json.primary_goal }}\"</td>\n                                </tr>\n                                <tr style=\"border-bottom: 1px solid #eeeeee;\">\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>LinkedIn:</strong></td>\n                                    <td style=\"padding: 10px 0;\"><a href=\"{{ $('Clean Up for Email').item.json.linkedin_url }}\" style=\"color: #007bff;\">View Profile</a></td>\n                                </tr>\n                                <tr>\n                                    <!-- ** IMPORTANT: Replace YOUR_SHEET_ID and YOUR_SHEET_GID with your actual Google Sheet values ** -->\n                                    <td style=\"padding: 10px 0; color: #555555;\"><strong>Lead Record:</strong></td>\n                                    <td style=\"padding: 10px 0;\"><a href=\"{{ $('Clean Up for Email').item.json.lead_record }}\" style=\"color: #007bff;\">View in Google Sheets</a></td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                    <!-- Action Box -->\n                    <tr>\n                        <td style=\"padding: 0 20px 30px 20px;\">\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"border-collapse: collapse; background-color: #e2f0e6; border-left: 4px solid #28a745;\">\n                                <tr>\n                                    <td style=\"padding: 20px;\">\n                                        <h3 style=\"margin-top: 0; color: #155724;\">Sales Approach</h3>\n                                        <p style=\"margin-bottom: 0; color: #333333;\">This high-value Enterprise lead requires a strategic approach. The conversation should focus on long-term value, data integrity, security, and scalability. Be prepared for a longer sales cycle and discussions with multiple stakeholders from different departments (e.g., IT, Finance, Operations).</p>\n                                    </td>\n                                </tr>\n                            </table>\n                        </td>\n                    </tr>\n                </table>\n            </td>\n        </tr>\n    </table>\n</body>\n</html>\n\n\n\n\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2592,
+        992
+      ],
+      "id": "09cd6efa-14da-4913-b43d-fb1a532a35e7",
+      "name": "Send a message2",
+      "webhookId": "84544455-3eb1-4646-9bf8-23278beef9f5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "6161e01d-af31-4018-8570-0055c0c6f6fd",
+              "leftValue": "={{ $json.matched_prospects[0].prospect_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -128,
+        672
+      ],
+      "id": "2da8d196-1fc9-4936-90c0-864449360f8a",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "dave@getfreetime.ai",
+        "subject": " New Lead Missing Enrichment ",
+        "emailType": "text",
+        "message": "=First Name: {{ $('Google Sheets Trigger').item.json['First Name'] }}\nLast Name: {{ $('Google Sheets Trigger').item.json['Last Name'] }}\nBusiness Email: {{ $('Google Sheets Trigger').item.json['Business Email'] }}\nCompany: {{ $('Google Sheets Trigger').item.json.Company }}\nCompany Website: {{ $('Google Sheets Trigger').item.json['Company Website'] }}\nPrimary Goal: {{ $('Google Sheets Trigger').item.json['What is your primary goal?'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        304,
+        960
+      ],
+      "id": "199cf8f9-fa6f-46c2-9856-78cba4fdbb7c",
+      "name": "Send a message3",
+      "webhookId": "84544455-3eb1-4646-9bf8-23278beef9f5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "dave@getfreetime.ai",
+        "subject": "Lead without Business Enrichment",
+        "emailType": "text",
+        "message": "=First Name: {{ $('Google Sheets Trigger').item.json['First Name'] }}\nLast Name: {{ $('Google Sheets Trigger').item.json['Last Name'] }}\nBusiness Email: {{ $('Google Sheets Trigger').item.json['Business Email'] }}\nCompany: {{ $('Google Sheets Trigger').item.json.Company }}\nCompany Website: {{ $('Google Sheets Trigger').item.json['Company Website'] }}\nPrimary Goal: {{ $('Google Sheets Trigger').item.json['What is your primary goal?'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        960
+      ],
+      "id": "9a56e7b5-fe95-4918-8402-56b48324d64a",
+      "name": "Send a message4",
+      "webhookId": "84544455-3eb1-4646-9bf8-23278beef9f5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "t9VMkeimCyD1ono8",
+          "name": "Gmail account Freetime"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8e8a8aeb-97a6-4cce-9b5d-a4184a26206c",
+              "leftValue": "={{ $json.Id }}",
+              "rightValue": "new",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "72f1e8db-a1d0-445d-98d6-5c0913bf6d83",
+              "leftValue": "={{ $json.Timestamp }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        -1072,
+        672
+      ],
+      "id": "65990412-d631-49b6-bbe5-3d6989e318cf",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "action": "generate"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -848,
+        672
+      ],
+      "id": "7ff74ada-9b71-4505-af6d-c812a8e94511",
+      "name": "Create Unique Id"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg",
+          "mode": "list",
+          "cachedResultName": "Lead Enrichment Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713633770,
+          "mode": "list",
+          "cachedResultName": "Form Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit#gid=1713633770"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.Timestamp }}",
+            "Id": "={{ $json.data }}",
+            "Lead Status": "Processing"
+          },
+          "matchingColumns": [
+            "Timestamp"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Business Email",
+              "displayName": "Business Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "What is your primary goal?",
+              "displayName": "What is your primary goal?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Job Title",
+              "displayName": "Enriched Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched LinkedIn URL",
+              "displayName": "Enriched LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Location",
+              "displayName": "Enriched Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Company Size",
+              "displayName": "Enriched Company Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Industry",
+              "displayName": "Enriched Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Company Description",
+              "displayName": "Enriched Company Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lead Segment",
+              "displayName": "Lead Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Updated",
+              "displayName": "Last Updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -624,
+        672
+      ],
+      "id": "8acca4fa-ab5f-453f-911e-fdd631c9af3e",
+      "name": "Update Row",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## If we can't enrich lead, update database and send message",
+        "height": 128,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        96,
+        1152
+      ],
+      "typeVersion": 1,
+      "id": "91a5837b-3c51-4f11-b07e-79becf364f84",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg",
+          "mode": "list",
+          "cachedResultName": "Lead Enrichment Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713633770,
+          "mode": "list",
+          "cachedResultName": "Form Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit#gid=1713633770"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Id": "={{ $('Update Row').item.json.Id }}",
+            "Last Updated": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Notes": "Unable to enrich"
+          },
+          "matchingColumns": [
+            "Id"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Business Email",
+              "displayName": "Business Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "What is your primary goal?",
+              "displayName": "What is your primary goal?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Job Title",
+              "displayName": "Enriched Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched LinkedIn URL",
+              "displayName": "Enriched LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Location",
+              "displayName": "Enriched Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Company Size",
+              "displayName": "Enriched Company Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Industry",
+              "displayName": "Enriched Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Company Description",
+              "displayName": "Enriched Company Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lead Segment",
+              "displayName": "Lead Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Updated",
+              "displayName": "Last Updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        960
+      ],
+      "id": "b6509ef9-311b-4b9e-ba39-61216383b300",
+      "name": "Update row without enrich",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f88fbf33-d62e-462b-b0f3-674291e8815e",
+              "name": "current_role",
+              "value": "={{ $json.data.experience.filter(item => item.company.name.toLowerCase() === $('Create Unique Id').item.json.Company.toLowerCase()).first()}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        656
+      ],
+      "id": "acc64896-7315-4636-bd59-fc89fd4f5efe",
+      "name": "Get Role for Form Company"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "08de79ac-2593-40be-b35d-782bea3ebe17",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        768,
+        656
+      ],
+      "id": "abd5943e-86d1-4385-8a56-86c1d3d6eafd",
+      "name": "If Business Not Found"
+    },
+    {
+      "parameters": {
+        "content": "## If we can't enrich business, update database and send message",
+        "height": 128,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        976,
+        1152
+      ],
+      "typeVersion": 1,
+      "id": "eade4339-a569-4571-a96e-da2ceb80d80f",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg",
+          "mode": "list",
+          "cachedResultName": "Lead Enrichment Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713633770,
+          "mode": "list",
+          "cachedResultName": "Form Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit#gid=1713633770"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Id": "={{ $('Update Row').item.json.Id }}",
+            "Last Updated": "={{ $now.format('yyyy-MM-dd HH:mm:ss') }}",
+            "Notes": "Unable to enrich business"
+          },
+          "matchingColumns": [
+            "Id"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Business Email",
+              "displayName": "Business Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "What is your primary goal?",
+              "displayName": "What is your primary goal?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Job Title",
+              "displayName": "Enriched Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched LinkedIn URL",
+              "displayName": "Enriched LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Location",
+              "displayName": "Enriched Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Company Size",
+              "displayName": "Enriched Company Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Industry",
+              "displayName": "Enriched Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Company Description",
+              "displayName": "Enriched Company Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lead Segment",
+              "displayName": "Lead Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Updated",
+              "displayName": "Last Updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        960
+      ],
+      "id": "7be32ee7-016b-44ac-9cf7-8d96fa36a0b5",
+      "name": "Update row without biz enrich",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the company size string from the previous node (e.g., \"51-200 employees\")\n// CHANGE 'Enrich_Business' to the actual name of your enrichment node\nconst companySizeString = $('Enrich_Business').item.json.data.number_of_employees_range;\n\nlet employeeCount = 0;\n\nif (companySizeString === 'Self-employed') {\n  employeeCount = 1;\n\n} else {\n  // Remove \" employees\", \"+\", and all commas for clean parsing\n  const cleanedString = companySizeString.replace(/ employees|\\+|,/g, '');\n  \n  // Split the string by the hyphen to handle ranges like \"51-200\"\n  const parts = cleanedString.split('-');\n  \n  // Take the last part of the split. For \"51-200\" this is \"200\". For \"10001\" this is \"10001\".\n  const maxString = parts[parts.length - 1];\n  \n  // Convert the final string part into an integer number\n  employeeCount = parseInt(maxString, 10);\n}\n\nlet leadSegment = \"Midmarket\"\n\nif (employeeCount < 50) {\n  leadSegment = \"SMB\";\n}\n\nif (employeeCount > 500) {\n  leadSegment = \"Enterprise\";\n}\n// Return the final number so the next nodes can use it\nreturn {\n  leadSegment\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        656
+      ],
+      "id": "236e277c-186b-4484-836a-6eb74a1b2c0b",
+      "name": "Find Lead Segment"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg",
+          "mode": "list",
+          "cachedResultName": "Lead Enrichment Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713633770,
+          "mode": "list",
+          "cachedResultName": "Form Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit#gid=1713633770"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Id": "={{ $('Create Unique Id').item.json.data }}",
+            "Enriched Job Title": "={{ $('Map Enriched Data').item.json['Enriched Job Title'] }}",
+            "Enriched LinkedIn URL": "={{ $('Map Enriched Data').item.json['Enriched LinkedIn URL'] }}",
+            "Enriched Location": "={{ $('Map Enriched Data').item.json['Enriched Location'] }}",
+            "Enriched Company Size": "={{ $('Map Enriched Data').item.json['Enriched Company Size'] }}",
+            "Enriched Industry": "={{ $('Map Enriched Data').item.json['Enriched Industry'] }}",
+            "Enriched Company Description": "={{ $('Map Enriched Data').item.json['Enriched Company Description'] }}",
+            "Lead Segment": "={{ $json.leadSegment }}",
+            "Lead Status": "Enriched",
+            "Last Updated": "={{ $now.format('yyyy-MM-dd HH:mm:ss')}}",
+            "Notes": "Successfully enriched"
+          },
+          "matchingColumns": [
+            "Id"
+          ],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Id",
+              "displayName": "Id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Business Email",
+              "displayName": "Business Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Company Website",
+              "displayName": "Company Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "What is your primary goal?",
+              "displayName": "What is your primary goal?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Enriched Job Title",
+              "displayName": "Enriched Job Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enriched LinkedIn URL",
+              "displayName": "Enriched LinkedIn URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enriched Location",
+              "displayName": "Enriched Location",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enriched Company Size",
+              "displayName": "Enriched Company Size",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enriched Industry",
+              "displayName": "Enriched Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Enriched Company Description",
+              "displayName": "Enriched Company Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Segment",
+              "displayName": "Lead Segment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Status",
+              "displayName": "Lead Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Updated",
+              "displayName": "Last Updated",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1664,
+        656
+      ],
+      "id": "5217d415-ad0b-4413-bb77-cdefca880270",
+      "name": "Update row with enriched data",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "Enriched Job Title",
+              "value": "={{ $('Enrich_Prospect').item.json.data.job_title }}"
+            },
+            {
+              "name": "Enriched LinkedIn URL",
+              "value": "={{ $('Enrich_Prospect').item.json.data.linkedin }}"
+            },
+            {
+              "name": "Enriched Location",
+              "value": "={{  $('Enrich_Prospect').item.json.data.city?.toTitleCase() || \"\" + $('Enrich_Prospect').item.json.data.country_name.toTitleCase() }}"
+            },
+            {
+              "name": "Enriched Company Size",
+              "value": "={{ $('Enrich_Business').item.json.data.number_of_employees_range }}"
+            },
+            {
+              "name": "Enriched Industry",
+              "value": "={{ $json.data.linkedin_industry_category.toTitleCase() }}"
+            },
+            {
+              "name": "Enriched Company Description",
+              "value": "={{ $json.data.business_description }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Map Enriched Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1216,
+        656
+      ],
+      "id": "36e15342-60b8-49d1-bee3-cf3bf9667b56"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "565d82bb-4806-4630-bc70-ccf7c24fd6f8",
+              "name": "full_name",
+              "value": "={{ $('Enrich_Prospect').item.json.data.full_name }}",
+              "type": "string"
+            },
+            {
+              "id": "a2330ead-f313-4f6e-b751-a0c15887f32a",
+              "name": "company_role",
+              "value": "={{ $json['Enriched Job Title'] }} at {{ $('Map Enriched Data').item.json.data.name }}",
+              "type": "string"
+            },
+            {
+              "id": "8086475c-0d4b-40cc-b3be-33d21c41a4f0",
+              "name": "company_size",
+              "value": "={{ $json['Enriched Company Size'] }}",
+              "type": "string"
+            },
+            {
+              "id": "b157e9f0-7274-4f41-851e-c59dfb40803a",
+              "name": "primary_goal",
+              "value": "={{ $('Google Sheets Trigger').item.json['What is your primary goal?'] }}",
+              "type": "string"
+            },
+            {
+              "id": "6ceef477-6669-4285-a7c2-e85c7c6db042",
+              "name": "linkedin_url",
+              "value": "={{ $json['Enriched LinkedIn URL'] }}",
+              "type": "string"
+            },
+            {
+              "id": "7ed9c0a2-6880-486f-8aa3-18ec34f4c6ad",
+              "name": "lead_record",
+              "value": "=https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?gid=1713633770&range=A{{ $json.row_number }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2080,
+        656
+      ],
+      "id": "241782ae-9087-4021-8255-b6e92c05e7f2",
+      "name": "Clean Up for Email"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg",
+          "mode": "list",
+          "cachedResultName": "Lead Enrichment Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1713633770,
+          "mode": "list",
+          "cachedResultName": "Form Responses",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1ksq0ah3o4NW-kokqXf1H-ZxwdkUZMnjpDkbwWf-2xHg/edit#gid=1713633770"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Id",
+              "lookupValue": "={{ $json.Id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1872,
+        656
+      ],
+      "id": "6a81c9ec-2622-4c86-a6f6-155a508378cb",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "e2uyXWo4VU4GIpcn",
+          "name": "Google Sheets FreetimeAI (Correct)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Match_prospect": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich_Prospect": {
+      "main": [
+        [
+          {
+            "node": "Get Role for Form Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match_business": {
+      "main": [
+        [
+          {
+            "node": "If Business Not Found",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enrich_Business": {
+      "main": [
+        [
+          {
+            "node": "Map Enriched Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Enrich_Prospect",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row without enrich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Create Unique Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Unique Id": {
+      "main": [
+        [
+          {
+            "node": "Update Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Row": {
+      "main": [
+        [
+          {
+            "node": "Match_prospect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row without enrich": {
+      "main": [
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Role for Form Company": {
+      "main": [
+        [
+          {
+            "node": "Match_business",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Business Not Found": {
+      "main": [
+        [
+          {
+            "node": "Enrich_Business",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row without biz enrich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row without biz enrich": {
+      "main": [
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Lead Segment": {
+      "main": [
+        [
+          {
+            "node": "Update row with enriched data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row with enriched data": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Map Enriched Data": {
+      "main": [
+        [
+          {
+            "node": "Find Lead Segment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Up for Email": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Clean Up for Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a890a0a476a68eaf42214f57390a10af1e99b8c5f18355d477d156ff4eb8462"
+  }
+}
